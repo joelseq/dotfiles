@@ -64,10 +64,10 @@ DISABLE_AUTO_TITLE="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(git colored-man-pages colorize pip python brew macos tmux tmuxinator history vi-mode)
 
-if [ -z "$_zsh_custom_scripts_loaded" ]; then
-  _zsh_custom_scripts_loaded=1
-  plugins+=(zsh-autosuggestions zsh-syntax-highlighting)
-fi
+# if [ -z "$_zsh_custom_scripts_loaded" ]; then
+#   _zsh_custom_scripts_loaded=1
+#   plugins+=(zsh-autosuggestions zsh-syntax-highlighting)
+# fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -127,5 +127,11 @@ prompt_context() {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Zsh syntax highlighting
+source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Zsh autosuggestions
+source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 neofetch
