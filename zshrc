@@ -110,9 +110,6 @@ ZSH_TMUX_AUTOSTART='true'
 # Hub alias
 alias git="hub"
 
-# NVM configuration
-export NVM_DIR="$HOME/.nvm"
-  . "/usr/local/opt/nvm/nvm.sh"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # Golang config

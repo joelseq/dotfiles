@@ -8,6 +8,7 @@
     ~/.bashrc: bashrc
     ~/.zshrc: zshrc
     ~/.vimrc: vimrc
+    ~/env.sh: env.sh
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
