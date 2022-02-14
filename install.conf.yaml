@@ -12,6 +12,9 @@
     ~/.config/alacritty:
       create: true
       path: config/alacritty
+    ~/.config/nvim:
+      create: true
+      path: config/nvim
 
 - shell:
-  - [git submodule update --init --recursive, Installing submodules]
+    - [git submodule update --init --recursive, Installing submodules]
