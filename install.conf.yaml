@@ -9,6 +9,9 @@
     ~/.zshrc: zshrc
     ~/.vimrc: vimrc
     ~/env.sh: env.sh
+    ~/.config/alacritty:
+      create: true
+      path: config/alacritty
 
 - shell:
   - [git submodule update --init --recursive, Installing submodules]
