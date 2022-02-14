@@ -1,4 +1,4 @@
-local opts = { noremap = true, silent = false }
+local opts = { noremap = true, silent = true }
 
 local term_opts = { silent = true }
 
@@ -45,6 +45,9 @@ keymap("n", "<S-h>", ":bprevious<CR>", opts)
 -- Stay in indent mode
 keymap("v", "<", "<gv", opts)
 keymap("v", ">", ">gv", opts)
+
+-- Unindent text with shift tab
+keymap("i", "<S-Tab>", "<C-d>", opts)
 
 -- Move text up and down
 keymap("n", "<M-j>", ":m .+1<CR>==", opts)
