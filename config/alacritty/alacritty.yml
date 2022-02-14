@@ -1,3 +1,10 @@
+window:
+  padding:
+    x: 5
+    y: 5
+
+  decorations: full
+
 # Font configuration (changes require restart)
 font:
   normal:

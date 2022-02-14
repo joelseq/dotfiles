@@ -128,6 +128,9 @@ prompt_context() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# Starship prompt
+eval "$(starship init zsh)"
+
 # Zsh syntax highlighting
 source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 

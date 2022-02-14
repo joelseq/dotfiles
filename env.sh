@@ -22,3 +22,5 @@ alias dcp='docker-compose'
 alias dm='docker-machine'
 alias k='kubectl'
 
+# Use exa instead of ls
+alias ls='exa'
