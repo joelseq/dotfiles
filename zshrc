@@ -78,7 +78,7 @@ source ~/env.sh
 
 # User configuration
 
-source ~/.fonts/*.sh
+# source ~/.fonts/*.sh
 
 # zsh tmux settings
 ZSH_TMUX_AUTOSTART='true'
