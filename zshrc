@@ -130,6 +130,9 @@ prompt_context() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# Source local machine specific zsh configuration
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
 # Starship prompt
 eval "$(starship init zsh)"
 
