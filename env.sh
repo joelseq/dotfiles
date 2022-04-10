@@ -24,3 +24,5 @@ alias k='kubectl'
 
 # Use exa instead of ls
 alias ls='exa'
+
+alias pn='pnpm'
