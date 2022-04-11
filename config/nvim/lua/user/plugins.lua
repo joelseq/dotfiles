@@ -82,6 +82,7 @@ return packer.startup(function(use)
 	use("jose-elias-alvarez/null-ls.nvim") -- for formatters and linters
 	use("b0o/schemastore.nvim") -- JSON schemas
 	use("tamago324/nlsp-settings.nvim")
+	use("jose-elias-alvarez/nvim-lsp-ts-utils") -- TypeScriptServer utils
 
 	--- Telescope
 	use("nvim-telescope/telescope.nvim")
