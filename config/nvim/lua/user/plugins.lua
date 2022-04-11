@@ -65,6 +65,8 @@ return packer.startup(function(use)
 			require("cosmic-ui").setup()
 		end,
 	})
+	use("tpope/vim-surround")
+	use("tpope/vim-repeat")
 
 	-- Colorschemes
 	-- use "lunarvim/colorschemes" -- A bunch of colorschemes you can try out
