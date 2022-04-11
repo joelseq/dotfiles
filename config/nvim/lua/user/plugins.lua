@@ -58,6 +58,13 @@ return packer.startup(function(use)
 	use("goolord/alpha-nvim")
 	use("antoinemadec/FixCursorHold.nvim") -- This is needed to fix lsp doc highlight
 	use("folke/which-key.nvim")
+	use({
+		"CosmicNvim/cosmic-ui",
+		requires = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+		config = function()
+			require("cosmic-ui").setup()
+		end,
+	})
 
 	-- Colorschemes
 	-- use "lunarvim/colorschemes" -- A bunch of colorschemes you can try out
