@@ -67,6 +67,13 @@ return packer.startup(function(use)
 	})
 	use("tpope/vim-surround")
 	use("tpope/vim-repeat")
+	use({
+		"folke/trouble.nvim",
+		requires = "kyazdani42/nvim-web-devicons",
+		config = function()
+			require("trouble").setup({})
+		end,
+	})
 
 	-- Colorschemes
 	-- use "lunarvim/colorschemes" -- A bunch of colorschemes you can try out

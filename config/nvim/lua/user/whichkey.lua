@@ -138,11 +138,11 @@ local mappings = {
 		-- a = { "<cmd>lua vim.lsp.buf.code_action()<cr>", "Code Action" },
 		a = { '<cmd>lua require("cosmic-ui").code_actions()<cr>', "Code Actions" },
 		d = {
-			"<cmd>Telescope lsp_document_diagnostics<cr>",
+			"<cmd>TroubleToggle document_diagnostics<cr>",
 			"Document Diagnostics",
 		},
 		w = {
-			"<cmd>Telescope lsp_workspace_diagnostics<cr>",
+			"<cmd>TroubleToggle workspace_diagnostics<cr>",
 			"Workspace Diagnostics",
 		},
 		f = { "<cmd>lua vim.lsp.buf.formatting()<cr>", "Format" },
@@ -157,7 +157,8 @@ local mappings = {
 			"Prev Diagnostic",
 		},
 		l = { "<cmd>lua vim.lsp.codelens.run()<cr>", "CodeLens Action" },
-		q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
+		-- q = { "<cmd>lua vim.lsp.diagnostic.set_loclist()<cr>", "Quickfix" },
+		q = { "<cmd>TroubleToggle <cr>", "Location List" },
 		r = { '<cmd>lua require("cosmic-ui").rename()<cr>', "Rename" },
 		s = { "<cmd>Telescope lsp_document_symbols<cr>", "Document Symbols" },
 		S = {
