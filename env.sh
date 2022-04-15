@@ -21,8 +21,6 @@ alias doc='docker'
 alias dcp='docker-compose'
 alias dm='docker-machine'
 alias k='kubectl'
-
-# Use exa instead of ls
-alias ls='exa'
-
+alias ls='exa' # Use exa instead of ls
 alias pn='pnpm'
+alias mux='tmuxinator'
