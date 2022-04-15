@@ -74,6 +74,13 @@ return packer.startup(function(use)
 			require("trouble").setup({})
 		end,
 	})
+	use({
+		"norcalli/nvim-colorizer.lua",
+		config = function()
+			require("colorizer").setup()
+		end,
+	})
+	use("christoomey/vim-tmux-navigator")
 
 	-- Colorschemes
 	-- use "lunarvim/colorschemes" -- A bunch of colorschemes you can try out
