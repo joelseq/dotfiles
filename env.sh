@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # Specify default editor. Possible values: vim, nano, ed etc.
-export EDITOR=vim
+export EDITOR=nvim
 
 # File search functions
 function f() { find . -iname "*$1*" ${@:2} }
