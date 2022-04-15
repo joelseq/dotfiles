@@ -19,11 +19,11 @@ vim.g.maplocalleader = " "
 --   command_mode = "c",
 
 -- Normal --
--- Better window navigation
-keymap("n", "<C-h>", "<C-w>h", opts)
-keymap("n", "<C-j>", "<C-w>j", opts)
-keymap("n", "<C-k>", "<C-w>k", opts)
-keymap("n", "<C-l>", "<C-w>l", opts)
+-- Better window navigation with tmux-navigator
+keymap("n", "<C-h>", ":TmuxNavigateLeft<CR>", opts)
+keymap("n", "<C-j>", ":TmuxNavigateDown<CR>", opts)
+keymap("n", "<C-k>", ":TmuxNavigateUp<CR>", opts)
+keymap("n", "<C-l>", ":TmuxNavigateRight<CR>", opts)
 
 -- Resize with arrows
 keymap("n", "<C-Up>", ":resize +2<CR>", opts)
@@ -65,4 +65,3 @@ keymap("x", "<M-k>", ":move '<-2<CR>gv-gv", opts)
 -- keymap("t", "<C-j>", "<C-\\><C-N><C-w>j", term_opts)
 -- keymap("t", "<C-k>", "<C-\\><C-N><C-w>k", term_opts)
 -- keymap("t", "<C-l>", "<C-\\><C-N><C-w>l", term_opts)
-

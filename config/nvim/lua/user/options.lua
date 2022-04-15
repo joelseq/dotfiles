@@ -45,3 +45,6 @@ end
 vim.cmd("set whichwrap+=<,>,[,],h,l")
 vim.cmd([[set iskeyword+=-]])
 vim.cmd([[set formatoptions-=cro]]) -- TODO: this doesn't seem to work
+
+--- vim-tmux-navigator disable default mappings
+vim.cmd("let g:tmux_navigator_no_mappings = 1")
