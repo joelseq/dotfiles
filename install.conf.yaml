@@ -17,6 +17,9 @@
       path: config/nvim
     ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux.conf.local: tmux.conf.local
+    ~/.config/kitty:
+      create: true
+      path: config/kitty
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
