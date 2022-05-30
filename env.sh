@@ -13,6 +13,9 @@ function mkcd() { mkdir -p "$@" && cd "$_"; }
 # After cd-ing into a directory, ls
 function cdls() { cd "$@" && ls; }
 
+# Convenient alias for sourcing zshrc
+alias sdf='source ~/.zshrc';
+
 # Example aliases
 alias cppcompile='c++ -std=c++11 -stdlib=libc++'
 alias g='git'
