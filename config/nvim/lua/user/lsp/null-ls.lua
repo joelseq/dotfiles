@@ -10,18 +10,28 @@ local formatting = null_ls.builtins.formatting
 local diagnostics = null_ls.builtins.diagnostics
 
 null_ls.setup({
-	debug = false,
+	debug = true,
 	sources = {
 		code_actions.eslint_d.with({
-			prefer_local = "node_modules/.bin",
+			env = {
+				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+			},
 		}),
 		diagnostics.eslint_d.with({
-			prefer_local = "node_modules/.bin",
+			env = {
+				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+			},
 		}),
 		formatting.eslint_d.with({
-			prefer_local = "node_modules/.bin",
+			env = {
+				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+			},
 		}),
-		formatting.prettierd.with({ extra_args = { "--single-quote", "--jsx-single-quote" } }),
+		formatting.prettierd.with({
+			env = {
+				PRETTIERD_LOCAL_PRETTIER_ONLY = 1,
+			},
+		}),
 		formatting.black.with({ extra_args = { "--fast" } }),
 		formatting.stylua,
 		code_actions.gitsigns,
