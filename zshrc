@@ -6,6 +6,9 @@ export ZSH="/Users/joelseq/.oh-my-zsh"
 
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
+# Source local machine specific zsh configuration
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
+
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -129,9 +132,6 @@ prompt_context() {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-# Source local machine specific zsh configuration
-[ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
 # Starship prompt
 eval "$(starship init zsh)"
