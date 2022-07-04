@@ -2,7 +2,7 @@ local M = {}
 
 function M.on_attach(client)
 	-- Disable formatting so that null-ls (prettier) will always be selected
-	client.resolved_capabilities.document_formatting = false
+	client.server_capabilities.documentFormattingProvider = false
 
 	local ts_utils = require("nvim-lsp-ts-utils")
 
