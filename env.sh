@@ -3,6 +3,9 @@
 # Specify default editor. Possible values: vim, nano, ed etc.
 export EDITOR=nvim
 
+# Golang
+export GO111MODULE=on
+
 # File search functions
 function f() { find . -iname "*$1*" ${@:2} }
 function r() { grep "$1" ${@:2} -R . }
