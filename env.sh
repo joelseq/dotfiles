@@ -16,6 +16,11 @@ function mkcd() { mkdir -p "$@" && cd "$_"; }
 # After cd-ing into a directory, ls
 function cdls() { cd "$@" && ls; }
 
+function proj() {
+  NAME=$(basename $PWD)
+  mux s project --name=${NAME} "$@"
+}
+
 # Convenient alias for sourcing zshrc
 alias sdf='source ~/.zshrc';
 
