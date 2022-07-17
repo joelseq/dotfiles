@@ -10,6 +10,7 @@ local servers = {
 	"yamlls",
 	"rust_analyzer",
 	"taplo",
+	"terraformls",
 }
 
 lsp_installer.setup()

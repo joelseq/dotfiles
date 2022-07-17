@@ -143,3 +143,6 @@ source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.z
 source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 neofetch
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /home/linuxbrew/.linuxbrew/Cellar/terraform/1.2.5/bin/terraform terraform
