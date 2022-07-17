@@ -16,11 +16,6 @@ function mkcd() { mkdir -p "$@" && cd "$_"; }
 # After cd-ing into a directory, ls
 function cdls() { cd "$@" && ls; }
 
-function proj() {
-  NAME=$(basename $PWD)
-  mux s project --name=${NAME} "$@"
-}
-
 # Convenient alias for sourcing zshrc
 alias sdf='source ~/.zshrc';
 
@@ -35,3 +30,9 @@ alias k='kubectl'
 alias ls='exa' # Use exa instead of ls
 alias pn='pnpm'
 alias mux='tmuxinator'
+
+# Quickly start a tmuxinator project in given directory
+function proj() {
+  NAME=$(basename $@)
+  mux s project --name=${NAME} "$@"
+}
