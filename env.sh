@@ -30,6 +30,7 @@ alias k='kubectl'
 alias ls='exa' # Use exa instead of ls
 alias pn='pnpm'
 alias mux='tmuxinator'
+alias tf='terraform'
 
 # Quickly start a tmuxinator project in given directory
 function proj() {
