@@ -3,7 +3,7 @@ local configs = require("nvim-treesitter.configs")
 configs.setup({
 	ensure_installed = "all",
 	sync_install = false,
-	ignore_install = { "" }, -- List of parsers to ignore installing
+	ignore_install = { "phpdoc", "tree-sitter-phpdoc" }, -- List of parsers to ignore installing
 	autopairs = {
 		enable = true,
 	},
