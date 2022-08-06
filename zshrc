@@ -67,7 +67,7 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(asdf git colored-man-pages colorize pip python brew macos tmux tmuxinator history vi-mode)
+plugins=(git colored-man-pages colorize pip python brew macos tmux tmuxinator history vi-mode)
 
 # if [ -z "$_zsh_custom_scripts_loaded" ]; then
 #   _zsh_custom_scripts_loaded=1
