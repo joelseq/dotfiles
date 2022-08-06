@@ -11,6 +11,9 @@ local servers = {
 	"rust_analyzer",
 	"taplo",
 	"terraformls",
+	"gopls",
+	"solargraph",
+	"sorbet",
 }
 
 lsp_installer.setup()
