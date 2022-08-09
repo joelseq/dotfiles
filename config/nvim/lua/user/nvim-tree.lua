@@ -12,6 +12,8 @@ local tree_cb = nvim_tree_config.nvim_tree_callback
 
 -- each of these are documented in `:help nvim-tree.OPTION_NAME`
 nvim_tree.setup({
+	sync_root_with_cwd = true,
+	respect_buf_cwd = true,
 	disable_netrw = true,
 	hijack_netrw = true,
 	open_on_setup = false,
@@ -46,6 +48,7 @@ nvim_tree.setup({
 	update_focused_file = {
 		enable = true,
 		update_cwd = true,
+		update_root = true,
 		ignore_list = {},
 	},
 	git = {
