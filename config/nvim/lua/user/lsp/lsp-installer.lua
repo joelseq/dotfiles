@@ -5,6 +5,7 @@ end
 
 local servers = {
 	"bashls",
+	"eslint",
 	"gopls",
 	"jsonls",
 	"rust_analyzer",

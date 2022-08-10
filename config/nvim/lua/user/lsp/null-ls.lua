@@ -7,26 +7,26 @@ local code_actions = null_ls.builtins.code_actions
 -- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/formatting
 local formatting = null_ls.builtins.formatting
 -- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/diagnostics
-local diagnostics = null_ls.builtins.diagnostics
+-- local diagnostics = null_ls.builtins.diagnostics
 
 null_ls.setup({
 	debug = true,
 	sources = {
-		code_actions.eslint_d.with({
-			env = {
-				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
-			},
-		}),
-		diagnostics.eslint_d.with({
-			env = {
-				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
-			},
-		}),
-		formatting.eslint_d.with({
-			env = {
-				ESLINT_D_LOCAL_ESLINT_ONLY = 1,
-			},
-		}),
+		-- code_actions.eslint_d.with({
+		-- 	env = {
+		-- 		ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+		-- 	},
+		-- }),
+		-- diagnostics.eslint_d.with({
+		-- 	env = {
+		-- 		ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+		-- 	},
+		-- }),
+		-- formatting.eslint_d.with({
+		-- 	env = {
+		-- 		ESLINT_D_LOCAL_ESLINT_ONLY = 1,
+		-- 	},
+		-- }),
 		formatting.prettierd.with({
 			env = {
 				PRETTIERD_LOCAL_PRETTIER_ONLY = 1,
