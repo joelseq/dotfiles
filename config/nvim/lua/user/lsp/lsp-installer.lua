@@ -43,6 +43,16 @@ for _, server in pairs(servers) do
 		opts = vim.tbl_deep_extend("force", sumneko_opts, opts)
 	end
 
+	if server == "sorbet" then
+		local sorbet_opts = require("user.lsp.settings.sorbet")
+		opts = vim.tbl_deep_extend("force", sorbet_opts, opts)
+	end
+
+	if server == "solargraph" then
+		local solargraph_opts = require("user.lsp.settings.solargraph")
+		opts = vim.tbl_deep_extend("force", solargraph_opts, opts)
+	end
+
 	if server == "rust_analyzer" then
 		require("rust-tools").setup({
 			tools = {
