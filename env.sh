@@ -24,7 +24,7 @@ alias cppcompile='c++ -std=c++11 -stdlib=libc++'
 alias g='git'
 
 alias doc='docker'
-alias dcp='docker-compose'
+alias dcp='docker compose'
 alias dm='docker-machine'
 alias k='kubectl'
 alias ls='exa' # Use exa instead of ls
