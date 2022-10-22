@@ -15,6 +15,9 @@
     ~/.config/nvim:
       create: true
       path: config/nvim/AstroNvim
+    ~/.config/nvim/lua/user:
+      create: true
+      path: config/nvim/user
     ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux.conf.local: tmux.conf.local
     ~/.config/kitty:
