@@ -14,7 +14,7 @@
       path: config/alacritty
     ~/.config/nvim:
       create: true
-      path: config/nvim
+      path: config/nvim/AstroNvim
     ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux.conf.local: tmux.conf.local
     ~/.config/kitty:
