@@ -138,6 +138,7 @@ local config = {
 		-- enable servers that you already have installed without mason
 		servers = {
 			-- "pyright"
+			"solargraph",
 		},
 		skip_setup = { "rust_analyzer", "tsserver" },
 		-- formatting = {
