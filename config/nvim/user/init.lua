@@ -138,7 +138,7 @@ local config = {
 		-- enable servers that you already have installed without mason
 		servers = {
 			-- "pyright"
-			"solargraph",
+			-- "solargraph",
 		},
 		skip_setup = { "rust_analyzer", "tsserver" },
 		-- formatting = {
@@ -189,6 +189,17 @@ local config = {
 			--     },
 			--   },
 			-- },
+			sorbet = {
+				root_dir = function()
+					local cwd = vim.fn.getcwd()
+
+					if string.find(cwd, "figma/figma") then
+						return cwd .. "/sinatra"
+					else
+						return cwd
+					end
+				end,
+			},
 		},
 	},
 
