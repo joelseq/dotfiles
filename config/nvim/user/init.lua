@@ -269,6 +269,13 @@ local config = {
 					})
 				end,
 			},
+			{
+				"kylechui/nvim-surround",
+				tag = "*", -- Use for stability; omit to use `main` branch for the latest features
+				config = function()
+					require("nvim-surround").setup({})
+				end,
+			},
 		},
 		-- All other entries override the require("<key>").setup({...}) call for default plugins
 		["null-ls"] = function(config) -- overrides `require("null-ls").setup(config)`
