@@ -26,7 +26,7 @@ local config = {
 	-- },
 
 	-- Set colorscheme to use
-	colorscheme = "default_theme",
+	colorscheme = "catppuccin",
 
 	-- Add highlight groups in any theme
 	highlights = {
@@ -274,6 +274,13 @@ local config = {
 				tag = "*", -- Use for stability; omit to use `main` branch for the latest features
 				config = function()
 					require("nvim-surround").setup({})
+				end,
+			},
+			{
+				"catppuccin/nvim",
+				as = "catppuccin",
+				config = function()
+					require("catppuccin").setup({})
 				end,
 			},
 		},
