@@ -141,25 +141,25 @@ local config = {
 			-- "solargraph",
 		},
 		skip_setup = { "rust_analyzer", "tsserver" },
-		-- formatting = {
-		--   -- control auto formatting on save
-		--   format_on_save = {
-		--     enabled = true, -- enable or disable format on save globally
-		--     allow_filetypes = { -- enable format on save for specified filetypes only
-		--       -- "go",
-		--     },
-		--     ignore_filetypes = { -- disable format on save for specified filetypes
-		--       -- "python",
-		--     },
-		--   },
-		--   disabled = { -- disable formatting capabilities for the listed language servers
-		--     -- "sumneko_lua",
-		--   },
-		--   timeout_ms = 1000, -- default format timeout
-		--   -- filter = function(client) -- fully override the default formatting function
-		--   --   return true
-		--   -- end
-		-- },
+		formatting = {
+			--   -- control auto formatting on save
+			--   format_on_save = {
+			--     enabled = true, -- enable or disable format on save globally
+			--     allow_filetypes = { -- enable format on save for specified filetypes only
+			--       -- "go",
+			--     },
+			--     ignore_filetypes = { -- disable format on save for specified filetypes
+			--       -- "python",
+			--     },
+			--   },
+			disabled = { -- disable formatting capabilities for the listed language servers
+				"sumneko_lua",
+			},
+			--   timeout_ms = 1000, -- default format timeout
+			--   -- filter = function(client) -- fully override the default formatting function
+			--   --   return true
+			--   -- end
+		},
 		-- easily add or disable built in mappings added during LSP attaching
 		mappings = {
 			n = {
@@ -265,7 +265,18 @@ local config = {
 				after = "mason-lspconfig.nvim",
 				config = function()
 					require("rust-tools").setup({
-						server = astronvim.lsp.server_settings("rust_analyzer"),
+						server = vim.tbl_deep_extend(astronvim.lsp.server_settings("rust_analyzer"), {
+							settings = {
+								["rust-analyzer"] = {
+									lens = {
+										enable = true,
+									},
+									checkOnSave = {
+										command = "clippy",
+									},
+								},
+							},
+						}),
 					})
 				end,
 			},
@@ -295,7 +306,7 @@ local config = {
 			-- https://github.com/jose-elias-alvarez/null-ls.nvim/tree/main/lua/null-ls/builtins/diagnostics
 			config.sources = {
 				-- Set a formatter
-				-- null_ls.builtins.formatting.stylua,
+				formatting.stylua,
 				-- null_ls.builtins.formatting.prettier,
 				formatting.prettierd.with({
 					env = {
