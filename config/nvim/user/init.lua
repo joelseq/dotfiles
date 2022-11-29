@@ -265,7 +265,7 @@ local config = {
 				after = "mason-lspconfig.nvim",
 				config = function()
 					require("rust-tools").setup({
-						server = vim.tbl_deep_extend(astronvim.lsp.server_settings("rust_analyzer"), {
+						server = vim.tbl_deep_extend("force", astronvim.lsp.server_settings("rust_analyzer"), {
 							settings = {
 								["rust-analyzer"] = {
 									lens = {
