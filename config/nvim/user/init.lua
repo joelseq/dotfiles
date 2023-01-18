@@ -26,7 +26,7 @@ local config = {
 	-- },
 
 	-- Set colorscheme to use
-	colorscheme = "catppuccin",
+	-- colorscheme = "catppuccin",
 
 	-- Add highlight groups in any theme
 	highlights = {
