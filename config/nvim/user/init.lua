@@ -297,6 +297,9 @@ local config = {
 					require("catppuccin").setup({})
 				end,
 			},
+			{
+				"mg979/vim-visual-multi",
+			},
 		},
 		-- All other entries override the require("<key>").setup({...}) call for default plugins
 		["null-ls"] = function(config) -- overrides `require("null-ls").setup(config)`
