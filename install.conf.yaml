@@ -23,6 +23,9 @@
     ~/.config/kitty:
       create: true
       path: config/kitty
+    ~/.config/gitui:
+      create: true
+      path: config/gitui
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
