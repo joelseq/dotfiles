@@ -353,6 +353,7 @@ local config = {
 		},
 		-- use mason-lspconfig to configure LSP installations
 		["mason-lspconfig"] = { -- overrides `require("mason-lspconfig").setup(...)`
+			ensure_installed = { "sumneko_lua", "rust_analyzer", "tsserver", "gopls" },
 		},
 		-- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
 		["mason-null-ls"] = { -- overrides `require("mason-null-ls").setup(...)`
