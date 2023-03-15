@@ -222,6 +222,10 @@ local config = {
 
 			-- Save without formatting
 			["<leader>n"] = { ":noa w<cr>", desc = "Save File without formatting" },
+
+			-- Yank file paths
+			["<leader>ya"] = { ":let @+ = expand('%:p')<cr>", desc = "[Y]ank [A]bsolute file path in current buffer" },
+			["<leader>yr"] = { ":let @+ = expand('%')<cr>", desc = "[Y]ank [R]elative file path in current buffer" },
 		},
 		t = {
 			-- setting a mapping to false will disable it
