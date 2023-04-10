@@ -37,3 +37,5 @@ function proj() {
   NAME=$(basename $@)
   mux s project --name=${NAME} "$@"
 }
+
+alias gundo='git reset --soft HEAD~1'
