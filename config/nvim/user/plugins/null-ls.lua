@@ -37,7 +37,7 @@ return {
         },
       },
       formatting.stylua,
-      null_ls.builtins.code_actions.gitsigns,
+      -- null_ls.builtins.code_actions.gitsigns,
     }
     return config -- return final config table
   end,
