@@ -13,12 +13,20 @@ return {
   "simrat39/rust-tools.nvim",
   {
     "kylechui/nvim-surround",
+    event = "InsertEnter",
     config = function() require("nvim-surround").setup {} end,
   },
-  "mg979/vim-visual-multi",
-  "mattn/emmet-vim",
+  {
+    "mg979/vim-visual-multi",
+    event = "InsertEnter",
+  },
+  {
+    "mattn/emmet-vim",
+    event = "InsertEnter",
+  },
   {
     "folke/todo-comments.nvim",
+    event = "BufRead",
     config = function() require("todo-comments").setup {} end,
   },
 }
