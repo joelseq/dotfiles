@@ -49,6 +49,13 @@ function fbr() {
   git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
 }
 
+function tms() {
+  local folder selected_name
+  folder=$(find ~/Code -mindepth 1 -maxdepth 1 -type d | fzf)
+  selected_name=$(basename "$folder" | tr . _)
+  mux s project --name=${selected_name} "$folder"
+}
+
 # fbr - checkout git branch (including remote branches)
 function fbra() {
   local branches branch
