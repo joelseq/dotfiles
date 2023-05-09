@@ -52,11 +52,22 @@ return {
     -- enable servers that you already have installed without mason
     servers = {
       -- "pyright"
+      "solargraph",
     },
     setup_handlers = {
       -- add custom handler
       tssserver = function(_, opts) require("typescript").setup { server = opts } end,
       rust_analyzer = function(_, opts) require("rust-tools").setup { server = opts } end,
+    },
+    config = {
+      sorbet = {
+        root_dir = function()
+          local cwd = vim.fn.getcwd()
+
+          if string.find(cwd, "figma/figma") then return cwd .. "/sinatra" end
+          return cwd
+        end,
+      },
     },
   },
 
