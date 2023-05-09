@@ -51,7 +51,7 @@ function fbr() {
 
 function tms() {
   local folder selected_name
-  folder=$(find ~/Code -mindepth 1 -maxdepth 1 -type d | fzf)
+  folder=$(find ~/Code -mindepth 1 -maxdepth 3 -type d | fzf)
   selected_name=$(basename "$folder" | tr . _)
   mux s project --name=${selected_name} "$folder"
 }
