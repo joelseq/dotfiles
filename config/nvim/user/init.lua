@@ -98,5 +98,12 @@ return {
     --     ["~/%.config/foo/.*"] = "fooscript",
     --   },
     -- }
+    vim.g.vimwiki_list = {
+      {
+        path = "~/Dropbox/vaults/personal-vault/",
+        syntax = "markdown",
+        ext = ".md",
+      },
+    }
   end,
 }

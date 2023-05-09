@@ -29,4 +29,8 @@ return {
     event = "BufRead",
     config = function() require("todo-comments").setup {} end,
   },
+  {
+    "vimwiki/vimwiki",
+    event = "InsertEnter",
+  },
 }
