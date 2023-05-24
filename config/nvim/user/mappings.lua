@@ -30,6 +30,9 @@ return {
     ["<leader>y"] = { name = "Yank File Path" },
     ["<leader>ya"] = { ":let @+ = expand('%:p')<cr>", desc = "[Y]ank [A]bsolute file path in current buffer" },
     ["<leader>yr"] = { ":let @+ = expand('%')<cr>", desc = "[Y]ank [R]elative file path in current buffer" },
+
+    -- Git Blame
+    ["<leader>gf"] = { ":GitBlameOpenFileURL<cr>", desc = "GitBlame Open [F]ile URL" },
   },
   t = {
     -- setting a mapping to false will disable it
