@@ -33,6 +33,13 @@ return {
 
     -- Git Blame
     ["<leader>gf"] = { ":GitBlameOpenFileURL<cr>", desc = "GitBlame Open [F]ile URL" },
+
+    -- Snippets
+    ["<leader>s"] = { name = "Snippets" },
+    ["<leader>ss"] = {
+      "<cmd>source ~/.config/nvim/lua/user/plugins/luasnip.lua<cr>",
+      desc = "Source luasnip file",
+    },
   },
   t = {
     -- setting a mapping to false will disable it
