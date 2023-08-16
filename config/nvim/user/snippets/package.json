@@ -12,6 +12,10 @@
       {
         "language": "javascript",
         "path": "./javascript.json"
+      },
+      {
+        "language": "go",
+        "path": "./go.json"
       }
     ]
   }

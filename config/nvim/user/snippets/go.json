@@ -1,0 +1,11 @@
+{
+  "if err not nil": {
+  "prefix": ["ienn"],
+    "body": [
+      "if err != nil {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Snippet for easily doing an if err != nil"
+  }
+}
