@@ -17,6 +17,7 @@ return {
           PRETTIERD_LOCAL_PRETTIER_ONLY = 1,
         },
         filetypes = {
+          "astro",
           "javascript",
           "javascriptreact",
           "typescript",
