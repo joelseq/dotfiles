@@ -80,3 +80,21 @@ function fco() {
         --ansi) || return
   git checkout $(awk '{print $2}' <<<"$target" )
 }
+
+function linux-clean() {
+  sudo apt autoclean
+  sudo apt autoremove
+  sudo apt clean
+  # Remove flatpak apps which take up a lot of space
+  flatpak uninstall --unused
+  # Remove docker things
+  docker system prune
+  # Remove stale lock files and outdated downloads for all formulae and casks,
+  # and remove old versions of installed formulae.
+  # Pass in -s flag for for scrubbing the entire cache
+  brew cleanup
+  # Clear unreferenced packages from pnpm store
+  pnpm store prune
+  # Clear npm cache
+  npm cache clean
+}
