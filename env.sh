@@ -28,6 +28,7 @@ alias dm='docker-machine'
 alias k='kubectl'
 alias ls='exa' # Use exa instead of ls
 alias pn='pnpm'
+alias pnpx='pnpm dlx'
 alias mux='tmuxinator'
 alias tf='terraform'
 
