@@ -2,7 +2,7 @@
     link:
       relink: true
 
-- clean: ['~']
+- clean: ["~"]
 
 - link:
     ~/.bashrc: bashrc
@@ -14,10 +14,7 @@
       path: config/alacritty
     ~/.config/nvim:
       create: true
-      path: config/nvim/AstroNvim
-    ~/.config/nvim/lua/user:
-      create: true
-      path: config/nvim/user
+      path: config/nvim
     ~/.tmux.conf: config/tmux/.tmux.conf
     ~/.tmux.conf.local: tmux.conf.local
     ~/.config/kitty:
