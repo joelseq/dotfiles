@@ -1,0 +1,9 @@
+{
+  "console log": {
+    "prefix": ["clog"],
+    "body": [
+      "console.log($0)"
+    ],
+    "description": "Snippet for logging to console"
+  }
+}

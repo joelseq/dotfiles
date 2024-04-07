@@ -5,5 +5,5 @@
 	path = config/tmux
 	url = https://github.com/gpakosz/.tmux
 [submodule "config/nvim/AstroNvim"]
-	path = config/nvim/AstroNvim
+	path = config/nvim-old/AstroNvim
 	url = https://github.com/AstroNvim/AstroNvim
