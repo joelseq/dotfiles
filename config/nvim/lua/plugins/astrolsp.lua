@@ -54,6 +54,15 @@ return {
           return cwd
         end,
       },
+      svelte = {
+        capabilities = {
+          workspace = {
+            didChangeWatchedFiles = {
+              dynamicRegistration = true,
+            },
+          },
+        },
+      },
     },
     -- customize how language servers are attached
     handlers = {
