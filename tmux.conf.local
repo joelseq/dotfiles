@@ -388,9 +388,11 @@ tmux_conf_uninstall_plugins_on_reload=true
 set -g @plugin 'tmux-plugins/tmux-resurrect'
 #set -g @plugin 'tmux-plugins/tmux-continuum'
 #set -g @continuum-restore 'on'
-set -g @plugin 'thewtex/tmux-mem-cpu-load'
-set -g @plugin 'robhurring/tmux-spotify'
-set -g @plugin 'catppuccin/tmux'
+# set -g @plugin 'thewtex/tmux-mem-cpu-load'
+# set -g @plugin 'robhurring/tmux-spotify'
+# set -g @plugin 'catppuccin/tmux'
+set -g @plugin 'dracula/tmux'
+set -g @dracula-show-left-icon session
 
 # Non .tmux settings
 set -g default-terminal "tmux-256color"
