@@ -7,6 +7,7 @@ return {
   -- == Examples of Adding Plugins ==
 
   -- "andweeb/presence.nvim",
+  "rebelot/kanagawa.nvim",
   {
     "ray-x/lsp_signature.nvim",
     event = "BufRead",
