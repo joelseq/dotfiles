@@ -29,7 +29,7 @@ return {
       vim.keymap.set("n", "<leader><leader>s", "<cmd>source ~/.config/nvim/lua/user/plugins/luasnip.lua<CR>")
 
       require("luasnip.loaders.from_vscode").lazy_load {
-        paths = { "~/.config/nvim/lua/user/snippets" },
+        paths = { "~/.config/nvim/lua/snippets" },
       }
     end,
   },
