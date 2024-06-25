@@ -42,6 +42,7 @@ return {
     servers = {
       -- "pyright"
       "solargraph",
+      "gleam",
     },
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
@@ -55,12 +56,22 @@ return {
           return cwd
         end,
       },
+      htmx = {
+        filetypes = { "html", "templ" },
+      },
       svelte = {
         capabilities = {
           workspace = {
             didChangeWatchedFiles = {
               dynamicRegistration = true,
             },
+          },
+        },
+      },
+      tailwindcss = {
+        init_options = {
+          userLanguages = {
+            templ = "html",
           },
         },
       },
