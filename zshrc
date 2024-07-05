@@ -132,6 +132,8 @@ prompt_context() {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Set up fzf key bindings and fuzzy completion
+source <(fzf --zsh)
 
 # Starship prompt
 eval "$(starship init zsh)"
