@@ -8,6 +8,8 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "Resume" }
 )
 
-vim.keymap.set("i", "<C-J>", "<C-N>", { remap = true })
+vim.keymap.set("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment line" })
+vim.keymap.set("x", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
 
-vim.keymap.set("i", "<C-K>", "<C-P>", { remap = true })
+-- Git Blame
+vim.keymap.set("n", "<leader>gf", ":GitBlameOpenFileURL<cr>", { desc = "GitBlame Open [F]ile URL" })
