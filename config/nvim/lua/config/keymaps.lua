@@ -10,6 +10,9 @@ vim.keymap.set(
 
 vim.keymap.set("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment line" })
 vim.keymap.set("x", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
+vim.keymap.set("n", "gl", function()
+  vim.diagnostic.open_float()
+end, { desc = "Hover diagnostics" })
 
 -- Git Blame
 vim.keymap.set("n", "<leader>gf", ":GitBlameOpenFileURL<cr>", { desc = "GitBlame Open [F]ile URL" })
