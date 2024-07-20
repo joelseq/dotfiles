@@ -16,3 +16,6 @@ end, { desc = "Hover diagnostics" })
 
 -- Git Blame
 vim.keymap.set("n", "<leader>gf", ":GitBlameOpenFileURL<cr>", { desc = "GitBlame Open [F]ile URL" })
+vim.keymap.set("n", "<leader>fw", function()
+  require("telescope.builtin").live_grep()
+end, { desc = "Find words" })
