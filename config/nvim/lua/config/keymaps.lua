@@ -8,8 +8,8 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "Resume" }
 )
 
-vim.keymap.set("n", "<leader>/", "gcc", { remap = true, desc = "Toggle comment line" })
-vim.keymap.set("x", "<leader>/", "gc", { remap = true, desc = "Toggle comment" })
+vim.keymap.set("x", "<leader><leader>/", "gc", { remap = true, desc = "Toggle comment" })
+vim.keymap.set("n", "<leader><leader>/", "gcc", { remap = true, desc = "Toggle comment line" })
 vim.keymap.set("n", "gl", function()
   vim.diagnostic.open_float()
 end, { desc = "Hover diagnostics" })
