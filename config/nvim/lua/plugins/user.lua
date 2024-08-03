@@ -107,6 +107,13 @@ return {
   },
 
   {
+    "ibhagwan/fzf-lua",
+    keys = {
+      { "<leader>/", false },
+    },
+  },
+
+  {
     "nvim-telescope/telescope.nvim",
     keys = {
       -- add a keymap to browse plugin files
@@ -116,6 +123,7 @@ return {
         function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
         desc = "Find Plugin File",
       },
+      { "<leader>/", false },
     },
     -- change some options
     opts = function()
