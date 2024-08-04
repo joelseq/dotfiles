@@ -16,6 +16,7 @@ return {
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.editing-support.nvim-devdocs" },
   { import = "astrocommunity.editing-support.conform-nvim" },
+  { import = "astrocommunity.editing-support.refactoring-nvim" },
   { import = "astrocommunity.bars-and-lines.bufferline-nvim" },
   -- import/override with your plugins folder
 }
