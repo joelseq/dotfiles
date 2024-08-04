@@ -49,13 +49,12 @@ return {
     config = function() require("leap").create_default_mappings() end,
   },
   {
-    "luckasRanarison/nvim-devdocs",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
-      "nvim-treesitter/nvim-treesitter",
+    "akinsho/bufferline.nvim",
+    opts = {
+      options = {
+        diagnostics = "nvim_lsp",
+      },
     },
-    opts = {},
   },
 
   -- == Examples of Overriding Plugins ==
