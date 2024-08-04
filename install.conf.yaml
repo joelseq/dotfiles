@@ -23,6 +23,9 @@
     ~/.config/gitui:
       create: true
       path: config/gitui
+    ~/.config/lazygit:
+      create: true
+      path: config/lazygit
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
