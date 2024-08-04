@@ -48,6 +48,15 @@ return {
     event = "BufEnter",
     config = function() require("leap").create_default_mappings() end,
   },
+  {
+    "luckasRanarison/nvim-devdocs",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    opts = {},
+  },
 
   -- == Examples of Overriding Plugins ==
 
