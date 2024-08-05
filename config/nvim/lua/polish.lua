@@ -15,3 +15,4 @@ vim.filetype.add {
     ["~/%.config/foo/.*"] = "fooscript",
   },
 }
+vim.opt.colorcolumn = "80"
