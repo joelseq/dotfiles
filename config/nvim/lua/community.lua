@@ -22,5 +22,9 @@ return {
   { import = "astrocommunity.editing-support.refactoring-nvim" },
   { import = "astrocommunity.bars-and-lines.bufferline-nvim" },
   { import = "astrocommunity.git.gitlinker-nvim" },
+  { import = "astrocommunity.file-explorer.oil-nvim" },
+  { import = "astrocommunity.pack.full-dadbod" },
+  { import = "astrocommunity.search.grug-far-nvim" },
+  { import = "astrocommunity.lsp.inc-rename-nvim" },
   -- import/override with your plugins folder
 }
