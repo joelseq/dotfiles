@@ -26,5 +26,6 @@ return {
   { import = "astrocommunity.pack.full-dadbod" },
   { import = "astrocommunity.search.grug-far-nvim" },
   { import = "astrocommunity.lsp.inc-rename-nvim" },
+  { import = "astrocommunity.diagnostics.trouble-nvim" },
   -- import/override with your plugins folder
 }
