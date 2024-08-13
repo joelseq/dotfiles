@@ -16,6 +16,7 @@ return {
         "eslint",
         "gopls",
         "rust_analyzer",
+        "sorbet",
         "svelte",
         "tailwindcss",
         "tsserver",

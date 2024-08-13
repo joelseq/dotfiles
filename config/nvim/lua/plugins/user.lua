@@ -48,14 +48,14 @@ return {
     event = "BufEnter",
     config = function() require("leap").create_default_mappings() end,
   },
-  {
-    "akinsho/bufferline.nvim",
-    opts = {
-      options = {
-        diagnostics = "nvim_lsp",
-      },
-    },
-  },
+  -- {
+  --   "akinsho/bufferline.nvim",
+  --   opts = {
+  --     options = {
+  --       diagnostics = "nvim_lsp",
+  --     },
+  --   },
+  -- },
 
   -- == Examples of Overriding Plugins ==
 
