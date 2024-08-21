@@ -16,7 +16,7 @@ return {
   { import = "astrocommunity.pack.tailwindcss" },
   { import = "astrocommunity.pack.rainbow-delimiter-indent-blankline" },
   { import = "astrocommunity.test.neotest" },
-  -- { import = "astrocommunity.utility.noice-nvim" },
+  { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.editing-support.nvim-devdocs" },
   { import = "astrocommunity.editing-support.conform-nvim" },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
