@@ -19,7 +19,7 @@ return {
         "sorbet",
         "svelte",
         "tailwindcss",
-        "tsserver",
+        -- "tsserver",
         "yamlls",
       })
     end,
