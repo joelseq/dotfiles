@@ -391,7 +391,7 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'
 #set -g @continuum-restore 'on'
 # set -g @plugin 'thewtex/tmux-mem-cpu-load'
 # set -g @plugin 'robhurring/tmux-spotify'
-set -g @plugin 'catppuccin/tmux'
+set -g @plugin 'catppuccin/tmux#v0.3.0'
 # set -g @plugin 'janoamaral/tokyo-night-tmux'
 # set -g @plugin 'dracula/tmux'
 # set -g @dracula-show-left-icon session
