@@ -10,7 +10,7 @@ return {
   { import = "astrocommunity.colorscheme.tokyonight-nvim" },
   { import = "astrocommunity.completion.copilot-lua" },
   { import = "astrocommunity.pack.go" },
-  { import = "astrocommunity.pack.typescript" },
+  -- { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.pack.gleam" },
   -- { import = "astrocommunity.pack.ruby" },
   { import = "astrocommunity.pack.tailwindcss" },
