@@ -65,6 +65,16 @@ return {
           },
         },
       },
+      vtsls = {
+        settings = {
+          typescript = {
+            tsserver = {
+              nodePath = "node",
+              maxTsServerMemory = 8192,
+            },
+          },
+        },
+      },
       tailwindcss = {
         init_options = {
           userLanguages = {
