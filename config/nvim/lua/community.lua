@@ -19,7 +19,7 @@ return {
   { import = "astrocommunity.test.neotest" },
   { import = "astrocommunity.utility.noice-nvim" },
   { import = "astrocommunity.editing-support.nvim-devdocs" },
-  -- { import = "astrocommunity.editing-support.conform-nvim" },
+  { import = "astrocommunity.editing-support.conform-nvim" },
   { import = "astrocommunity.editing-support.refactoring-nvim" },
   -- { import = "astrocommunity/fuzzy-finder/snacks-picker" },
   -- { import = "astrocommunity.bars-and-lines.bufferline-nvim" },
