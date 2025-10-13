@@ -42,6 +42,9 @@ function proj() {
 alias g='git'
 alias gundo='git reset --soft HEAD~1'
 
+# Override l alias
+alias l='ls -lah --icons'
+
 # fbr - checkout git branch
 function fbr() {
   local branches branch
