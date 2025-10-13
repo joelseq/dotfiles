@@ -15,6 +15,7 @@ return {
   -- { import = "astrocommunity.pack.ruby" },
   { import = "astrocommunity.pack.cpp" },
   { import = "astrocommunity.pack.tailwindcss" },
+  { import = "astrocommunity.pack.svelte" },
   { import = "astrocommunity.pack.rainbow-delimiter-indent-blankline" },
   { import = "astrocommunity.test.neotest" },
   { import = "astrocommunity.utility.noice-nvim" },
