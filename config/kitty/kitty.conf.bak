@@ -1,5 +1,5 @@
 # Fonts
-font_family      JetBrainsMono Nerd Font
+font_family      family="JetBrainsMono Nerd Font Mono"
 italic_font      auto
 bold_font        auto
 bold_italic_font auto
@@ -40,7 +40,7 @@ sync_to_monitor yes
 
 # Bell
 visual_bell_duration 0.0
-enable_audio_bell no
+enable_audio_bell yes
 
 # Window
 remember_window_size   yes
@@ -79,3 +79,9 @@ include Catppuccin-Mocha.conf
 # italic_font      auto
 # bold_italic_font auto
 # END_KITTY_FONTS
+
+
+# BEGIN_KITTY_THEME
+# Tokyo Night
+include current-theme.conf
+# END_KITTY_THEME

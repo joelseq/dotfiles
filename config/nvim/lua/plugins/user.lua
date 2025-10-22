@@ -8,6 +8,7 @@ return {
 
   -- "andweeb/presence.nvim",
   "rebelot/kanagawa.nvim",
+  "RRethy/base16-nvim",
   -- {
   --   "ray-x/lsp_signature.nvim",
   --   event = "BufRead",

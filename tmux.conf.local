@@ -392,7 +392,9 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'
 # set -g @plugin 'thewtex/tmux-mem-cpu-load'
 # set -g @plugin 'robhurring/tmux-spotify'
 # set -g @plugin 'catppuccin/tmux#v0.3.0'
-set -g @plugin 'janoamaral/tokyo-night-tmux'
+# set -g @plugin 'janoamaral/tokyo-night-tmux'
+set -g @plugin 'z3z1ma/tmux-gruvbox'
+set -g @gruvbox_flavour 'dark'
 # set -g @plugin 'dracula/tmux'
 # set -g @dracula-show-left-icon session
 
