@@ -32,6 +32,7 @@ return {
         "lua_ls",
         "tsserver",
         "vtsls",
+        "solargraph",
       },
       timeout_ms = 1000, -- default format timeout
       -- filter = function(client) -- fully override the default formatting function
@@ -82,6 +83,9 @@ return {
             templ = "html",
           },
         },
+      },
+      clangd = {
+        filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
       },
     },
     -- customize how language servers are attached
