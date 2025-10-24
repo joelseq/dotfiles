@@ -43,7 +43,7 @@ alias g='git'
 alias gundo='git reset --soft HEAD~1'
 
 # Override l alias
-alias l='ls -lah --icons'
+alias l='ls -lah --icons=always'
 
 # fbr - checkout git branch
 function fbr() {
