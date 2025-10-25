@@ -125,4 +125,5 @@ return {
       )
     end,
   },
+  "tpope/vim-obsession",
 }
