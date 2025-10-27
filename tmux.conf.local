@@ -396,6 +396,8 @@ set -g @resurrect-strategy-nvim 'session'
 # set -g @plugin 'janoamaral/tokyo-night-tmux'
 set -g @plugin 'z3z1ma/tmux-gruvbox'
 set -g @gruvbox_flavour 'dark'
+set -g @gruvbox_window_default_text "#W"
+set -g @gruvbox_window_current_text "#W"
 # set -g @plugin 'dracula/tmux'
 # set -g @dracula-show-left-icon session
 
