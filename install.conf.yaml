@@ -26,6 +26,9 @@
     ~/.config/lazygit:
       create: true
       path: config/lazygit
+    ~/.claude/CLAUDE.md: config/claude/CLAUDE.md
+    ~/.claude/settings.json: config/claude/settings.json
+    ~/.claude/statusline-command.sh: config/claude/statusline-command.sh
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
