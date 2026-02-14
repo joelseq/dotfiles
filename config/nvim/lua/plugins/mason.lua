@@ -21,6 +21,7 @@ return {
         "tailwindcss",
         -- "tsserver",
         "yamlls",
+        "zls",
       })
     end,
   },
