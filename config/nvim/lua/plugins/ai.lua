@@ -5,7 +5,12 @@ return {
   {
     "coder/claudecode.nvim",
     -- dependencies = { "folke/snack.nvim" },
-    config = true,
+    dependencies = { "sindrets/diffview.nvim" },
+    opts = {
+      diff_opts = {
+        provider = "diffview",
+      },
+    },
     keys = {
       { "<leader>a", nil, desc = "AI/Claude Code" },
       { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
