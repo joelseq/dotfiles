@@ -3,6 +3,19 @@
     "type": "command",
     "command": "bash /home/joelseq/.claude/statusline-command.sh"
   },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "notify-send 'Claude Code' 'Waiting for your input' --icon=terminal"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
@@ -16,6 +29,7 @@
     "security-guidance@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true
+    "plugin-dev@claude-plugins-official": true,
+    "web-asset-generator@web-asset-generator-marketplace": true
   }
 }
