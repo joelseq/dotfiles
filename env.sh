@@ -103,6 +103,9 @@ function linux-clean() {
   npm cache clean
 }
 
+# Orchestra - Claude Code session orchestrator
+function orch() { tmux display-popup -E -w 80% -h 80% "orchestra"; }
+
 # yazi - a terminal file manager
 function y() {
 	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
