@@ -126,4 +126,46 @@ return {
     end,
   },
   "tpope/vim-obsession",
+  {
+    "gaoDean/autolist.nvim",
+    ft = {
+      "markdown",
+      "text",
+      "tex",
+      "plaintex",
+      "norg",
+    },
+    config = function()
+      require("autolist").setup()
+
+      vim.keymap.set("i", "<tab>", "<cmd>AutolistTab<cr>")
+      vim.keymap.set("i", "<s-tab>", "<cmd>AutolistShiftTab<cr>")
+      vim.keymap.set("n", "o", "o<cmd>AutolistNewBullet<cr>")
+      vim.keymap.set("n", "O", "O<cmd>AutolistNewBulletBefore<cr>")
+      vim.keymap.set("n", "<CR>", "<cmd>AutolistToggleCheckbox<cr><CR>")
+      vim.keymap.set("n", "<C-r>", "<cmd>AutolistRecalculate<cr>")
+      vim.keymap.set("n", "<leader>cn", require("autolist").cycle_next_dr, { expr = true })
+      vim.keymap.set("n", "<leader>cp", require("autolist").cycle_prev_dr, { expr = true })
+      vim.keymap.set("n", ">>", ">><cmd>AutolistRecalculate<cr>")
+      vim.keymap.set("n", "<<", "<<<cmd>AutolistRecalculate<cr>")
+      vim.keymap.set("n", "dd", "dd<cmd>AutolistRecalculate<cr>")
+      vim.keymap.set("v", "d", "d<cmd>AutolistRecalculate<cr>")
+    end,
+  },
+  {
+    "saghen/blink.cmp",
+    opts = {
+      keymap = {
+        ["<CR>"] = {
+          function(cmp)
+            -- If completion menu open, accept; either way, trigger autolist after
+            local accepted = cmp.accept()
+            vim.schedule(function() require("autolist").new_bullet() end)
+            return accepted
+          end,
+          "fallback",
+        },
+      },
+    },
+  },
 }
