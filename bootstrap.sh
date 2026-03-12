@@ -97,7 +97,6 @@ install_brew_packages() {
     zsh-syntax-highlighting
     zsh-autosuggestions
     tmux
-    tmuxinator
     lazygit
     yazi
     bat
@@ -121,6 +120,15 @@ install_brew_packages() {
     ok "fzf shell integration configured"
   else
     ok "fzf shell integration already configured"
+  fi
+
+  # tmuxinator via gem (avoid brew pulling in its own ruby)
+  if ! command -v tmuxinator &>/dev/null; then
+    info "Installing tmuxinator via gem..."
+    gem install tmuxinator
+    ok "tmuxinator installed"
+  else
+    ok "tmuxinator already installed"
   fi
 
   ok "Brew packages installed"
