@@ -210,7 +210,29 @@ set_default_shell() {
 }
 
 # ---------------------------------------------------------------------------
-# 9. Copy claude config (before dotbot so symlinks are skipped)
+# 9. Back up existing dotfiles that conflict with dotbot symlinks
+# ---------------------------------------------------------------------------
+backup_existing_dotfiles() {
+  local backup_dir="$HOME/.dotfiles-backup"
+  local files_to_check=(.zshrc .bashrc .vimrc)
+  local backed_up=0
+
+  for file in "${files_to_check[@]}"; do
+    if [[ -f "$HOME/$file" && ! -L "$HOME/$file" ]]; then
+      mkdir -p "$backup_dir"
+      mv "$HOME/$file" "$backup_dir/$file.$(date +%s)"
+      backed_up=$((backed_up + 1))
+      ok "Backed up ~/$file to $backup_dir/$file"
+    fi
+  done
+
+  if [[ $backed_up -eq 0 ]]; then
+    ok "No conflicting dotfiles to back up"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 10. Copy claude config (before dotbot so symlinks are skipped)
 # ---------------------------------------------------------------------------
 copy_claude_config() {
   local claude_dir="$HOME/.claude"
@@ -238,7 +260,7 @@ copy_claude_config() {
 }
 
 # ---------------------------------------------------------------------------
-# 10. Run dotbot (./install)
+# 11. Run dotbot (./install)
 # ---------------------------------------------------------------------------
 run_dotbot() {
   info "Running dotbot to symlink dotfiles..."
@@ -247,7 +269,7 @@ run_dotbot() {
 }
 
 # ---------------------------------------------------------------------------
-# 11. Install neovim plugins
+# 12. Install neovim plugins
 # ---------------------------------------------------------------------------
 install_nvim_plugins() {
   if ! command -v nvim &>/dev/null; then
@@ -276,6 +298,7 @@ main() {
   install_ruby_build
   set_default_shell
   copy_claude_config
+  backup_existing_dotfiles
   run_dotbot
   install_nvim_plugins
 
