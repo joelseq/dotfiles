@@ -87,6 +87,13 @@ return {
       clangd = {
         filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
       },
+      ruby_lsp = {
+        settings = {
+          rubyLsp = {
+            bundleGemfile = "./Gemfile",
+          },
+        },
+      },
     },
     -- customize how language servers are attached
     handlers = {
