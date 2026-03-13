@@ -29,6 +29,9 @@
     ~/.config/lazygit:
       create: true
       path: config/lazygit
+    ~/.config/tmuxinator/dotfiles.yml: config/tmuxinator/dotfiles.yml
+    ~/.config/tmuxinator/figma.yml: config/tmuxinator/figma.yml
+    ~/.config/tmuxinator/project.yml: config/tmuxinator/project.yml
     ~/.claude/CLAUDE.md: config/claude/CLAUDE.md
     ~/.claude/settings.json: config/claude/settings.json
     ~/.claude/statusline-command.sh: config/claude/statusline-command.sh
