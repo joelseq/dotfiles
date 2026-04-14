@@ -103,7 +103,6 @@ install_brew_packages() {
     jq
     tree-sitter
     hub
-    rbenv
     mise
   )
 
@@ -178,21 +177,32 @@ install_nvm() {
 }
 
 # ---------------------------------------------------------------------------
-# 7. Install rbenv + ruby-build
+# 7. Bridge mise-managed rubies into rbenv (Coder devbox injects rbenv shims
+#    into PATH before shell init; this ensures they resolve to mise's ruby)
 # ---------------------------------------------------------------------------
-install_ruby_build() {
-  local rbenv_root
-  rbenv_root="$(rbenv root 2>/dev/null || echo "$HOME/.rbenv")"
+bridge_mise_rbenv() {
+  local rbenv_root="${RBENV_ROOT:-$HOME/.rbenv}"
 
-  if [[ -d "$rbenv_root/plugins/ruby-build" ]]; then
-    ok "ruby-build already installed"
+  # Only needed when rbenv shims dir exists on PATH
+  if [[ ":$PATH:" != *":$rbenv_root/shims:"* ]]; then
+    ok "No rbenv shims on PATH, skipping bridge"
     return 0
   fi
 
-  info "Installing ruby-build plugin..."
-  mkdir -p "$rbenv_root/plugins"
-  git clone https://github.com/rbenv/ruby-build.git "$rbenv_root/plugins/ruby-build"
-  ok "ruby-build installed"
+  local mise_ruby_dir="/usr/local/mise/installs/ruby"
+  if [[ -d "$mise_ruby_dir" ]]; then
+    mkdir -p "$rbenv_root/versions"
+    for ver_dir in "$mise_ruby_dir"/*/; do
+      local ver
+      ver="$(basename "$ver_dir")"
+      if [[ ! -e "$rbenv_root/versions/$ver" ]]; then
+        ln -s "$ver_dir" "$rbenv_root/versions/$ver"
+        ok "Linked mise ruby $ver into rbenv"
+      fi
+    done
+  else
+    ok "No mise ruby installs found, skipping bridge"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -303,7 +313,7 @@ main() {
   install_brew_packages
   install_oh_my_zsh
   install_nvm
-  install_ruby_build
+  bridge_mise_rbenv
   set_default_shell
   copy_claude_config
   backup_existing_dotfiles
