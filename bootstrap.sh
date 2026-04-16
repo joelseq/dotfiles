@@ -250,31 +250,28 @@ backup_existing_dotfiles() {
 }
 
 # ---------------------------------------------------------------------------
-# 10. Copy claude config (before dotbot so symlinks are skipped)
+# 10. Install work-config overlay
 # ---------------------------------------------------------------------------
-copy_claude_config() {
-  local claude_dir="$HOME/.claude"
-  local source_dir="$DOTFILES_DIR/config/claude"
+install_work_config() {
+  local work_config_dir="$HOME/Code/work-config"
+  local repo_url="https://github.com/joelseqfigma/work-config.git"
 
-  if [[ ! -d "$source_dir" ]]; then
-    warn "Claude config source not found at $source_dir, skipping"
-    return 0
+  if [[ -d "$work_config_dir/.git" ]]; then
+    ok "work-config already cloned"
+  else
+    info "Cloning work-config..."
+    mkdir -p "$HOME/Code"
+    if command -v gh &>/dev/null; then
+      gh repo clone joelseqfigma/work-config "$work_config_dir"
+    else
+      git clone "$repo_url" "$work_config_dir"
+    fi
+    ok "work-config cloned"
   fi
 
-  mkdir -p "$claude_dir"
-
-  for file in "$source_dir"/*; do
-    local filename
-    filename="$(basename "$file")"
-    if [[ ! -e "$claude_dir/$filename" ]]; then
-      cp "$file" "$claude_dir/$filename"
-      ok "Copied $filename to $claude_dir/"
-    else
-      ok "$claude_dir/$filename already exists, skipping"
-    fi
-  done
-
-  ok "Claude config in place"
+  info "Running work-config overlay..."
+  bash "$work_config_dir/install"
+  ok "work-config overlay applied"
 }
 
 # ---------------------------------------------------------------------------
@@ -315,10 +312,10 @@ main() {
   install_nvm
   bridge_mise_rbenv
   set_default_shell
-  copy_claude_config
   backup_existing_dotfiles
   run_dotbot
   install_nvim_plugins
+  install_work_config
 
   echo ""
   ok "Bootstrap complete!"
