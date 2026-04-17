@@ -279,8 +279,11 @@ install_work_config() {
 # ---------------------------------------------------------------------------
 run_dotbot() {
   info "Running dotbot to symlink dotfiles..."
-  bash "$DOTFILES_DIR/install"
-  ok "Dotfiles symlinked"
+  if bash "$DOTFILES_DIR/install"; then
+    ok "Dotfiles symlinked"
+  else
+    warn "Dotbot reported issues (some symlinks may already be managed by work-config)"
+  fi
 }
 
 # ---------------------------------------------------------------------------
