@@ -257,7 +257,12 @@ install_work_config() {
   local repo_url="git@github.com:figma/joelseqfigma-work.git"
 
   if [[ -d "$work_config_dir/.git" ]]; then
-    ok "work-config already cloned"
+    info "Pulling latest work-config..."
+    if git -C "$work_config_dir" pull --ff-only; then
+      ok "work-config updated"
+    else
+      warn "work-config pull failed (local changes?), continuing"
+    fi
   else
     info "Cloning work-config..."
     mkdir -p "$HOME/Code"
