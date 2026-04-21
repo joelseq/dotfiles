@@ -254,7 +254,7 @@ backup_existing_dotfiles() {
 # ---------------------------------------------------------------------------
 install_work_config() {
   local work_config_dir="$HOME/Code/work-config"
-  local repo_url="https://github.com/joelseqfigma/work-config.git"
+  local repo_url="git@github.com:figma/joelseqfigma-work.git"
 
   if [[ -d "$work_config_dir/.git" ]]; then
     ok "work-config already cloned"
@@ -262,7 +262,7 @@ install_work_config() {
     info "Cloning work-config..."
     mkdir -p "$HOME/Code"
     if command -v gh &>/dev/null; then
-      gh repo clone joelseqfigma/work-config "$work_config_dir"
+      gh repo clone figma/joelseqfigma-work "$work_config_dir"
     else
       git clone "$repo_url" "$work_config_dir"
     fi
