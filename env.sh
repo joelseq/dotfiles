@@ -49,6 +49,7 @@ alias pnp='pnpm pack'
 alias pnpx='pnpm dlx'
 alias mux='tmuxinator'
 alias tf='terraform'
+alias nvimc='nvim --no-restore'
 
 # Quickly start a tmuxinator project in given directory
 function proj() {
