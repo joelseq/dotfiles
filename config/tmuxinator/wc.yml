@@ -1,0 +1,12 @@
+# /Users/jsequeira/.config/tmuxinator/wc.yml
+
+name: wc
+root: ~/Code/work-config
+
+windows:
+  - editor: nvim
+  - terms:
+      layout: even-horizontal
+      panes:
+          - # empty
+          - # empty
