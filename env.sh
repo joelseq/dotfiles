@@ -10,6 +10,21 @@ export GO111MODULE=on
 function f() { find . -iname "*$1*" ${@:2} }
 function r() { grep "$1" ${@:2} -R . }
 
+# Kill process running on a given port
+function killport() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: killport <port>" >&2
+    return 1
+  fi
+  local pid=$(lsof -ti :"$1")
+  if [[ -z "$pid" ]]; then
+    echo "No process found on port $1"
+    return 1
+  fi
+  echo "Killing PID $pid on port $1"
+  kill -9 $pid
+}
+
 # Create a folder and move into it in one command
 function mkcd() { mkdir -p "$@" && cd "$_"; }
 
@@ -116,4 +131,30 @@ function y() {
 	IFS= read -r -d '' cwd < "$tmp"
 	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
+}
+
+# Forward TCP port(s) from a coder workspace to localhost (same port both sides).
+# Targets the devcontainer agent by default; override with AGENT env var
+# (e.g. AGENT=workspace coder-forward joel-devbox-1 8080).
+# Usage: coder-forward <workspace> <port> [port...]
+function coder-forward() {
+  local workspace="$1"; shift
+  if [[ -z "$workspace" || $# -eq 0 ]]; then
+    echo "Usage: coder-forward <workspace> <port> [port...]" >&2
+    return 1
+  fi
+  local target="${workspace}.${AGENT:-devcontainer}"
+  local args=()
+  for p in "$@"; do args+=(--tcp "${p}:${p}"); done
+  coder port-forward "$target" "${args[@]}"
+}
+
+# Open today's daily note in nvim
+function dn() {
+  local note="$HOME/Dropbox (Personal)/vaults/personal-vault/journal/daily/$(date +%Y-%m-%d).md"
+  if [[ -f "$note" ]]; then
+    nvim "$note"
+  else
+    echo "No daily note for today: $(date +%Y-%m-%d)"
+  fi
 }
