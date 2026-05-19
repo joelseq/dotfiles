@@ -404,6 +404,10 @@ set -g @gruvbox_window_current_text "#W"
 # Non .tmux settings
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
+if-shell 'test -n "$MOSH_CONNECTION"' {
+  set -g default-terminal "screen-256color"
+  set -g terminal-overrides ""
+}
 
 # Smart pane switching with awareness of Vim splits.
 # See: https://github.com/christoomey/vim-tmux-navigator
