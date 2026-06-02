@@ -15,6 +15,7 @@ return {
         "bashls",
         "eslint",
         "gopls",
+        "ruby-lsp",
         "rust_analyzer",
         "sorbet",
         "svelte",
