@@ -112,6 +112,9 @@ install_brew_packages() {
   brew tap withgraphite/tap
   brew install withgraphite/tap/graphite
 
+  # Hunk diff viewer
+  brew install modem-dev/tap/hunk
+
   # fzf shell integration
   if [[ ! -f ~/.fzf.zsh ]]; then
     info "Setting up fzf shell integration..."
