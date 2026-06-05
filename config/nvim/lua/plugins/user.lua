@@ -125,13 +125,7 @@ return {
       )
     end,
   },
-  {
-    "rmagatti/auto-session",
-    lazy = false,
-    opts = {
-      suppressed_dirs = { "~/", "~/Downloads", "/tmp" },
-    },
-  },
+  "tpope/vim-obsession",
   {
     "gaoDean/autolist.nvim",
     ft = {
