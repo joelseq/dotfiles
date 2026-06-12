@@ -16,13 +16,14 @@ function killport() {
     echo "Usage: killport <port>" >&2
     return 1
   fi
-  local pid=$(lsof -ti :"$1")
-  if [[ -z "$pid" ]]; then
+  local -a pids
+  pids=(${(fu)"$(lsof -ti :"$1")"})
+  if (( ${#pids} == 0 )); then
     echo "No process found on port $1"
     return 1
   fi
-  echo "Killing PID $pid on port $1"
-  kill -9 $pid
+  echo "Killing PIDs ${(j: :)pids} on port $1"
+  kill -9 -- "${pids[@]}"
 }
 
 # Create a folder and move into it in one command
