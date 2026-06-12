@@ -77,6 +77,11 @@ return {
           },
         },
       },
+      eslint = {
+        cmd_env = {
+          NODE_OPTIONS = "--max-old-space-size=8192",
+        },
+      },
       tailwindcss = {
         init_options = {
           userLanguages = {
@@ -88,11 +93,10 @@ return {
         filetypes = { "c", "cpp", "objc", "objcpp", "cuda" },
       },
       ruby_lsp = {
-        settings = {
-          rubyLsp = {
-            bundleGemfile = "./Gemfile",
-          },
-        },
+        cmd = { "bundle", "exec", "ruby-lsp" },
+        root_dir = function(fname)
+          return require("lspconfig.util").root_pattern("Gemfile", ".git")(fname)
+        end,
       },
     },
     -- customize how language servers are attached
