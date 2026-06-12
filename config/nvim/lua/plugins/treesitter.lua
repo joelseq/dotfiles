@@ -2,10 +2,14 @@
 
 ---@type LazySpec
 return {
-  "nvim-treesitter/nvim-treesitter",
+  "AstroNvim/astrocore",
+  ---@type AstroCoreOpts
   opts = function(_, opts)
-    -- add more things to the ensure_installed table protecting against community packs modifying it
-    opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
+    opts.treesitter = opts.treesitter or {}
+    opts.treesitter.highlight = true
+    opts.treesitter.indent = true
+    opts.treesitter.auto_install = true
+    opts.treesitter.ensure_installed = require("astrocore").list_insert_unique(opts.treesitter.ensure_installed or {}, {
       "lua",
       "vim",
       -- add more arguments for adding more treesitter parsers
