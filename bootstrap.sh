@@ -101,7 +101,7 @@ install_brew_packages() {
     yazi
     bat
     jq
-    tree-sitter
+    tree-sitter-cli
     hub
     mise
   )
