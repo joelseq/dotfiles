@@ -8,6 +8,10 @@ return {
   "AstroNvim/astrolsp",
   ---@type AstroLSPOpts
   opts = {
+    -- use native `vim.lsp.config`/`vim.lsp.enable` instead of the deprecated
+    -- `require("lspconfig")` framework (lets mason auto-enable native-only servers
+    -- like tsgo, and silences the lspconfig deprecation warning)
+    native_lsp_config = true,
     -- Configuration table of features provided by AstroLSP
     features = {
       codelens = true, -- enable/disable codelens refresh on start
@@ -32,6 +36,7 @@ return {
         "ts_ls",
         "tsserver",
         "vtsls",
+        "tsgo",
         "solargraph",
       },
       timeout_ms = 1000, -- default format timeout
@@ -42,17 +47,20 @@ return {
     -- enable servers that you already have installed without mason
     servers = {
       -- "pyright"
+      -- NOTE: tsgo is installed + auto-enabled via mason (see mason.lua); native
+      -- mode lets mason's auto-enable start it from its `lsp/tsgo.lua` config.
     },
     -- customize language server configuration options passed to `vim.lsp.config`
     ---@diagnostic disable: missing-fields
     config = {
       -- clangd = { capabilities = { offsetEncoding = "utf-8" } },
       sorbet = {
-        root_dir = function()
+        -- native `vim.lsp.config` root_dir signature: (bufnr, on_dir)
+        root_dir = function(_, on_dir)
           local cwd = vim.fn.getcwd()
 
-          if string.find(cwd, "figma/figma") then return cwd .. "/sinatra" end
-          return cwd
+          if string.find(cwd, "figma/figma") then return on_dir(cwd .. "/sinatra") end
+          on_dir(cwd)
         end,
       },
       htmx = {
@@ -63,16 +71,6 @@ return {
           workspace = {
             didChangeWatchedFiles = {
               dynamicRegistration = true,
-            },
-          },
-        },
-      },
-      vtsls = {
-        settings = {
-          typescript = {
-            tsserver = {
-              nodePath = "node",
-              maxTsServerMemory = 8192,
             },
           },
         },
@@ -94,9 +92,8 @@ return {
       },
       ruby_lsp = {
         cmd = { "bundle", "exec", "ruby-lsp" },
-        root_dir = function(fname)
-          return require("lspconfig.util").root_pattern("Gemfile", ".git")(fname)
-        end,
+        -- native `vim.lsp.config` root_dir signature: (bufnr, on_dir)
+        root_dir = function(bufnr, on_dir) on_dir(vim.fs.root(bufnr, { "Gemfile", ".git" }) or vim.fn.getcwd()) end,
       },
     },
     -- customize how language servers are attached
@@ -106,6 +103,7 @@ return {
 
       -- the key is the server that is being setup with `vim.lsp.config`
       -- rust_analyzer = false, -- setting a handler to false will disable the set up of that language server
+      vtsls = false, -- use tsgo instead (configured via `servers` above)
     },
     -- Configure buffer local auto commands to add when attaching a language server
     autocmds = {

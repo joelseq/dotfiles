@@ -21,6 +21,9 @@ return {
         "svelte",
         "tailwindcss",
         -- "ts_ls",
+        -- tsgo binary is managed here, but it's ENABLED in plugins/lspconfig.lua
+        -- (mason's auto-enable can't start it — tsgo ships only a native `lsp/` config)
+        "tsgo",
         "yamlls",
         "zls",
       })
