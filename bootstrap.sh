@@ -177,6 +177,16 @@ install_nvm() {
   else
     ok "Node.js already available"
   fi
+
+  # tsgo: native TS language server (used by nvim instead of vtsls).
+  # Not packaged by mason, so install globally via npm.
+  if command -v tsgo &>/dev/null; then
+    ok "tsgo already installed"
+  else
+    info "Installing tsgo (@typescript/native-preview)..."
+    npm install -g @typescript/native-preview
+    ok "tsgo installed"
+  fi
 }
 
 # ---------------------------------------------------------------------------
