@@ -1,56 +1,35 @@
--- Customize Mason plugins
-
+-- Install Mason-managed tools (LSP servers, formatters, linters, debuggers).
+--
+-- IMPORTANT: these are mason-tool-installer entries and use *mason package names*
+-- (e.g. "ruby-lsp"), NOT lspconfig/null-ls/dap source names (e.g. "ruby_lsp").
+-- AstroNvim nulls out the `ensure_installed` of mason-lspconfig / mason-null-ls /
+-- mason-nvim-dap whenever mason-tool-installer is present (it is — community packs
+-- like go/svelte pull it in), so mason-tool-installer is the ONLY list that
+-- actually installs anything. Server enabling still happens via mason-lspconfig's
+-- auto-enable of installed packages.
 ---@type LazySpec
 return {
-  -- use mason-lspconfig to configure LSP installations
-  {
-    "mason-org/mason-lspconfig.nvim",
-    -- overrides `require("mason-lspconfig").setup(...)`
-    opts = function(_, opts)
-      -- add more things to the ensure_installed table protecting against community packs modifying it
-      opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
-        "lua_ls",
-        -- add more arguments for adding more language servers
-        "astro",
-        "bashls",
-        "eslint",
-        "gopls",
-        "ruby_lsp",
-        "rust_analyzer",
-        "sorbet",
-        "svelte",
-        "tailwindcss",
-        -- "ts_ls",
-        -- tsgo binary is managed here, but it's ENABLED in plugins/lspconfig.lua
-        -- (mason's auto-enable can't start it — tsgo ships only a native `lsp/` config)
-        "tsgo",
-        "yamlls",
-        "zls",
-      })
-    end,
-  },
-  -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
-  {
-    "jay-babu/mason-null-ls.nvim",
-    -- overrides `require("mason-null-ls").setup(...)`
-    opts = function(_, opts)
-      -- add more things to the ensure_installed table protecting against community packs modifying it
-      opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
-        -- "prettier",
-        "stylua",
-        -- add more arguments for adding more null-ls sources
-      })
-    end,
-  },
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    -- overrides `require("mason-nvim-dap").setup(...)`
-    opts = function(_, opts)
-      -- add more things to the ensure_installed table protecting against community packs modifying it
-      opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
-        "python",
-        -- add more arguments for adding more debuggers
-      })
-    end,
-  },
+  "WhoIsSethDaniel/mason-tool-installer.nvim",
+  opts = function(_, opts)
+    opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
+      -- LSP servers
+      "lua-language-server",
+      "astro-language-server",
+      "bash-language-server",
+      "eslint-lsp",
+      "gopls",
+      "ruby-lsp",
+      "rust-analyzer",
+      "sorbet",
+      "svelte-language-server",
+      "tailwindcss-language-server",
+      "tsgo",
+      "yaml-language-server",
+      "zls",
+      -- formatters / linters
+      "stylua",
+      -- debuggers
+      "debugpy",
+    })
+  end,
 }

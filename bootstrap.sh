@@ -316,6 +316,13 @@ install_nvim_plugins() {
   info "Installing neovim plugins (lazy.nvim sync)..."
   nvim --headless "+Lazy! sync" +qa 2>/dev/null
   ok "Neovim plugins installed"
+
+  # Install Mason tools synchronously. The normal install path is gated behind
+  # opening a file (`User AstroFile`) and runs async, so a headless `Lazy! sync`
+  # alone never installs LSPs/formatters. MasonToolsInstallSync forces it + blocks.
+  info "Installing Mason tools (LSPs, formatters, debuggers)..."
+  nvim --headless "+MasonToolsInstallSync" +qa 2>/dev/null
+  ok "Mason tools installed"
 }
 
 # ---------------------------------------------------------------------------
