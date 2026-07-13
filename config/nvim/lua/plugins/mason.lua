@@ -22,7 +22,7 @@ return {
       "rust-analyzer",
       "sorbet",
       "svelte-language-server",
-      "tailwindcss-language-server",
+      -- "tailwindcss-language-server",
       "tsgo",
       "yaml-language-server",
       "zls",
