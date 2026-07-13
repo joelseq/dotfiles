@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# git restrict-refs-figma — DESTRUCTIVE ref-restriction speedup for figma/figma.
+#
+# Source: Figma "Git & GitHub" notion doc, Performance > Restricting fetched refs.
+# Restricts `git fetch` to master, stable, <prefix>/*, release-202*,
+# release-hotfix*, and no tags — then purges the tens of thousands of accumulated
+# remote-tracking branches + tags and repacks. REPO-LOCAL only.
+#
+# Trade-off: to fetch a coworker's branch afterwards you must first run
+#   git remote set-branches --add origin <branch> && git fetch
+# (or use a helper like `gcr <branch>`).
+#
+# Usage (inside the figma/figma repo):
+#   git restrict-refs-figma [<prefix>] [--yes]
+#     <prefix>  your branch namespace (default: git config figma.branchPrefix, else $USER)
+#     --yes     skip the confirmation prompt
+set -euo pipefail
+
+ok()   { printf '\033[1;32m[restrict-refs]\033[0m %s\n' "$*"; }
+info() { printf '\033[1;34m[restrict-refs]\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m[restrict-refs]\033[0m %s\n' "$*"; }
+die()  { printf '\033[1;31m[restrict-refs]\033[0m %s\n' "$*" >&2; exit 1; }
+
+GIT=/usr/bin/git
+command -v "$GIT" >/dev/null 2>&1 || GIT=git
+
+# args
+PREFIX=""
+ASSUME_YES=0
+for arg in "$@"; do
+  case "$arg" in
+    --yes|-y) ASSUME_YES=1 ;;
+    *) PREFIX="$arg" ;;
+  esac
+done
+[[ -n "$PREFIX" ]] || PREFIX="$("$GIT" config --get figma.branchPrefix || true)"
+[[ -n "$PREFIX" ]] || PREFIX="${USER:-}"
+[[ -n "$PREFIX" ]] || die "could not determine branch prefix; pass it as the first argument"
+
+"$GIT" rev-parse --is-inside-work-tree >/dev/null 2>&1 || die "not inside a git work tree"
+origin_url="$("$GIT" config --get remote.origin.url || true)"
+[[ "$origin_url" == *figma/figma* ]] || die "origin ($origin_url) doesn't look like figma/figma; refusing"
+
+n_remote="$("$GIT" for-each-ref --format='x' refs/remotes/ | wc -l | tr -d ' ')"
+n_tags="$("$GIT" for-each-ref --format='x' refs/tags/ | wc -l | tr -d ' ')"
+
+warn "This will DELETE $n_remote remote-tracking branches and $n_tags tags, then repack."
+warn "Fetch will be restricted to: master, stable, ${PREFIX}/*, release-202*, release-hotfix* (no tags)."
+if [[ "$ASSUME_YES" -ne 1 ]]; then
+  read -r -p "Proceed? [y/N] " reply
+  [[ "$reply" =~ ^[Yy]$ ]] || die "aborted"
+fi
+
+info "restricting fetch refspec..."
+"$GIT" remote set-branches origin master
+"$GIT" remote set-branches --add origin stable
+"$GIT" remote set-branches --add origin "${PREFIX}/*"
+"$GIT" remote set-branches --add origin 'release-202*'
+"$GIT" remote set-branches --add origin 'release-hotfix*'
+"$GIT" config remote.origin.tagOpt --no-tags
+
+info "deleting remote-tracking branches (parallel pass, then serial cleanup)..."
+"$GIT" branch -r | xargs -P8 -L 1 "$GIT" branch -rD >/dev/null 2>&1 || true
+"$GIT" branch -r | xargs -L 1 "$GIT" branch -rD >/dev/null 2>&1 || true
+
+info "deleting local tags..."
+"$GIT" tag | xargs -L 1 "$GIT" tag -d >/dev/null 2>&1 || true
+
+info "fetching restricted refs..."
+"$GIT" fetch
+
+info "garbage-collecting + repacking (this can take a while on a 37GB repo)..."
+"$GIT" gc --aggressive --prune=now
+"$GIT" prune
+"$GIT" reflog expire --expire=now --all
+"$GIT" repack -ad
+"$GIT" prune-packed
+
+ok "done. Remote-tracking refs now: $("$GIT" for-each-ref --format='x' refs/remotes/ | wc -l | tr -d ' ')"
+ok "to track a coworker branch later: git remote set-branches --add origin <branch> && git fetch"

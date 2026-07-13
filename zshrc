@@ -8,6 +8,9 @@ export ZSH="$HOME/.oh-my-zsh"
 
 export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
+# dotfiles helper scripts (git-enable-fsmonitor, etc.)
+export PATH="$HOME/dotfiles/bin:$PATH"
+
 # Source local machine specific zsh configuration
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 

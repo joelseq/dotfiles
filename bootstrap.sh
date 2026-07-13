@@ -331,6 +331,30 @@ install_nvim_plugins() {
 }
 
 # ---------------------------------------------------------------------------
+# 13. Apply transparent figma/figma git perf settings (Tier 1, idempotent).
+#     Tier 2 (destructive ref-restriction) is opt-in: run `git restrict-refs-figma`
+#     manually. Both scripts live in bin/ (on PATH as git subcommands).
+# ---------------------------------------------------------------------------
+configure_figma_git() {
+  local repo
+  for repo in "$HOME/figma/figma" "$HOME/Code/figma/figma"; do
+    if [[ -d "$repo/.git" ]]; then
+      info "Applying transparent git perf settings to $repo..."
+      # repo-local branch prefix so `git restrict-refs-figma` (Tier 2, manual)
+      # uses jsequeira/* without an argument. Repo-local per the doc's no-global rule.
+      (cd "$repo" && git config --local figma.branchPrefix jsequeira) || true
+      if (cd "$repo" && "$DOTFILES_DIR/bin/git-optimize-figma"); then
+        ok "figma/figma git perf settings applied"
+      else
+        warn "git-optimize-figma failed for $repo (continuing)"
+      fi
+      return 0
+    fi
+  done
+  ok "No figma/figma checkout found, skipping git perf settings"
+}
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 main() {
@@ -349,6 +373,7 @@ main() {
   run_dotbot
   install_nvim_plugins
   install_work_config
+  configure_figma_git
 
   echo ""
   ok "Bootstrap complete!"
