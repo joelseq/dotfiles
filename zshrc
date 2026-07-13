@@ -11,9 +11,6 @@ export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 # dotfiles helper scripts (git-enable-fsmonitor, etc.)
 export PATH="$HOME/dotfiles/bin:$PATH"
 
-# Source local machine specific zsh configuration
-[ -f ~/.zshrc.local ] && source ~/.zshrc.local
-
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
@@ -164,3 +161,6 @@ esac
 
 # Orchestra
 eval "$(orchestra init zsh)"
+
+# Source local machine-specific zsh configuration last so it overrides the above
+[ -f ~/.zshrc.local ] && source ~/.zshrc.local
