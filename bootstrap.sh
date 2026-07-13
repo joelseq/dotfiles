@@ -6,9 +6,9 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 # ---------------------------------------------------------------------------
 # Colored output helpers
 # ---------------------------------------------------------------------------
-info()  { printf '\033[1;34m[INFO]\033[0m  %s\n' "$*"; }
-ok()    { printf '\033[1;32m[OK]\033[0m    %s\n' "$*"; }
-warn()  { printf '\033[1;33m[WARN]\033[0m  %s\n' "$*"; }
+info() { printf '\033[1;34m[INFO]\033[0m  %s\n' "$*"; }
+ok() { printf '\033[1;32m[OK]\033[0m    %s\n' "$*"; }
+warn() { printf '\033[1;33m[WARN]\033[0m  %s\n' "$*"; }
 error() { printf '\033[1;31m[ERROR]\033[0m %s\n' "$*"; }
 
 # ---------------------------------------------------------------------------
@@ -16,8 +16,11 @@ error() { printf '\033[1;31m[ERROR]\033[0m %s\n' "$*"; }
 # ---------------------------------------------------------------------------
 detect_os() {
   case "$(uname -s)" in
-    Linux) OS="linux" ;;
-    *)     error "Unsupported OS: $(uname -s)"; exit 1 ;;
+  Linux) OS="linux" ;;
+  *)
+    error "Unsupported OS: $(uname -s)"
+    exit 1
+    ;;
   esac
 
   if command -v apt-get &>/dev/null; then
@@ -25,7 +28,8 @@ detect_os() {
   elif command -v dnf &>/dev/null; then
     PKG_MGR="dnf"
   else
-    error "No supported package manager found (need apt-get or dnf)"; exit 1
+    error "No supported package manager found (need apt-get or dnf)"
+    exit 1
   fi
 
   ok "Detected OS: $OS (pkg manager: $PKG_MGR)"
@@ -98,6 +102,7 @@ install_brew_packages() {
     zsh-autosuggestions
     tmux
     lazygit
+    watchman
     yazi
     bat
     jq
