@@ -6,7 +6,7 @@
 # global config breaks external-repo fetches like fs wasm.
 #
 # Applies:
-#   - fsmonitor (via git enable-fsmonitor: daemon if supported, else watchman)
+#   - fsmonitor (via git enable-fsmonitor: built-in daemon where supported)
 #   - feature.manyFiles=true  (index.skipHash, index.version=4, core.untrackedCache)
 #   - core.commitgraph=true
 #   - fetch.writeCommitGraph=true
@@ -34,7 +34,8 @@ if [[ "${1:-}" != "--force" && "$origin_url" != *figma/figma* ]]; then
   die "origin ($origin_url) doesn't look like figma/figma; re-run with --force to apply anyway"
 fi
 
-# fsmonitor (repo-local). Delegates daemon-vs-watchman decision to the helper.
+# fsmonitor (repo-local). Helper enables the built-in daemon where supported,
+# and skips fsmonitor otherwise (no watchman).
 "$SCRIPT_DIR/git-enable-fsmonitor"
 
 # manyFiles bundle: index.skipHash + index.version=4 + core.untrackedCache

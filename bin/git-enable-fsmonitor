@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 # git enable-fsmonitor — speed up `git status` in large repos via fsmonitor.
 #
-# Prefers git's built-in fsmonitor daemon (`core.fsmonitor=true`). On platforms
-# where the daemon is unsupported (e.g. some Coder/devbox Linux images report
-# "fsmonitor--daemon not supported on this platform"), falls back to the
-# watchman query hook shipped alongside this script.
+# Uses git's built-in fsmonitor daemon (`core.fsmonitor=true`) where supported.
+# On platforms where the daemon is unsupported (e.g. some Coder/devbox Linux
+# images report "fsmonitor--daemon not supported on this platform"), fsmonitor
+# is skipped — untrackedCache + feature.manyFiles already give most of the
+# status speedup there, without a watchman daemon (which regressed status on
+# large repos: cold state + recrawls cost more than the delta they save).
 #
 # Repo-local only — never touches global config.
 #
 # Usage (inside any git repo):
-#   git enable-fsmonitor          # enable (daemon if supported, else watchman)
-#   git enable-fsmonitor --off    # disable + stop watching
+#   git enable-fsmonitor          # enable built-in daemon (skips if unsupported)
+#   git enable-fsmonitor --off    # disable
 set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK="$SCRIPT_DIR/git-fsmonitor-watchman"
 
 info() { printf '\033[1;34m[fsmonitor]\033[0m %s\n' "$*"; }
 ok()   { printf '\033[1;32m[fsmonitor]\033[0m %s\n' "$*"; }
@@ -29,6 +28,7 @@ TOPLEVEL="$("$GIT" rev-parse --show-toplevel)"
 
 if [[ "${1:-}" == "--off" ]]; then
   "$GIT" config --unset core.fsmonitor || true
+  # clean up any watchman watch left by the old fallback (harmless if absent)
   command -v watchman >/dev/null 2>&1 && watchman watch-del "$TOPLEVEL" >/dev/null 2>&1 || true
   ok "disabled fsmonitor for $TOPLEVEL"
   exit 0
@@ -40,15 +40,14 @@ if [[ "$daemon_status" != *"not supported"* ]]; then
   "$GIT" config core.fsmonitor true
   info "using built-in fsmonitor daemon"
 else
-  command -v watchman >/dev/null 2>&1 || die "daemon unsupported and watchman not installed (brew install watchman)"
-  [[ -x "$HOOK" ]] || die "shared watchman hook missing/not executable: $HOOK"
-  "$GIT" config core.fsmonitor "$HOOK"
-  info "built-in daemon unsupported here; using watchman hook"
+  # No watchman fallback: skip fsmonitor and rely on untrackedCache below.
+  "$GIT" config --unset core.fsmonitor 2>/dev/null || true
+  info "built-in daemon unsupported here; skipping fsmonitor (untrackedCache still applied)"
 fi
 
 "$GIT" config core.untrackedCache true
 
-info "warming fsmonitor (first status crawls the whole tree; subsequent runs are fast)..."
+info "warming caches (first status crawls the whole tree; subsequent runs are fast)..."
 "$GIT" status --porcelain >/dev/null
 ok "enabled for $TOPLEVEL"
-ok "core.fsmonitor -> $("$GIT" config --get core.fsmonitor)"
+ok "core.fsmonitor -> $("$GIT" config --get core.fsmonitor || echo '(unset)')"

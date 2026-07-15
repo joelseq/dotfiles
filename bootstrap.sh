@@ -102,7 +102,6 @@ install_brew_packages() {
     zsh-autosuggestions
     tmux
     lazygit
-    watchman
     yazi
     bat
     jq
