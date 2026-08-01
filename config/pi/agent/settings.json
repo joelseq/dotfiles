@@ -3,5 +3,8 @@
   "theme": "gruvbox-dark",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "medium"
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "npm:pi-web-access"
+  ]
 }
