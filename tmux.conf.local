@@ -398,6 +398,23 @@ set -g @plugin 'z3z1ma/tmux-gruvbox'
 set -g @gruvbox_flavour 'dark'
 set -g @gruvbox_window_default_text "#W"
 set -g @gruvbox_window_current_text "#W"
+
+# Make active pane much easier to identify
+set -g pane-border-style "fg=#3c3836"
+set -g pane-active-border-style "fg=#fabd2f,bold"
+
+# Dim inactive panes slightly; keep active pane normal
+set -g window-style "fg=#928374"
+set -g window-active-style "fg=default"
+
+# Show pane labels in borders
+set -g pane-border-status top
+set -g pane-border-format "#{?pane_active,#[fg=#1d2021 bg=#fabd2f bold] ACTIVE #[fg=#fabd2f bg=default] #{pane_index}:#{pane_current_command} ,#[fg=#665c54] #{pane_index}:#{pane_current_command} }"
+
+# Improve prefix+q pane indicators
+set -g display-panes-colour "#928374"
+set -g display-panes-active-colour "#fabd2f"
+
 # set -g @plugin 'dracula/tmux'
 # set -g @dracula-show-left-icon session
 
