@@ -36,6 +36,9 @@
     ~/.claude/CLAUDE.md: config/claude/CLAUDE.md
     ~/.claude/settings.json: config/claude/settings.json
     ~/.claude/statusline-command.sh: config/claude/statusline-command.sh
+    ~/.agents/skills:
+      create: true
+      path: config/agents/skills
     ~/.pi/agent/settings.json:
       create: true
       path: config/pi/agent/settings.json
