@@ -415,9 +415,9 @@ set -g pane-active-border-style "fg=#fabd2f,bold"
 set -g window-style "fg=#928374"
 set -g window-active-style "fg=default"
 
-# Show pane labels in borders
+# Show pane labels in borders, highlighting the selected pane label
 set -g pane-border-status top
-set -g pane-border-format "#{?pane_active,#[fg=#1d2021 bg=#fabd2f bold] ACTIVE #[fg=#fabd2f bg=default] #{pane_index}:#{pane_current_command} ,#[fg=#665c54] #{pane_index}:#{pane_current_command} }"
+set -g pane-border-format "#{?pane_active,#[fg=#1d2021 bg=#fabd2f bold] #{pane_index}:#{pane_current_command} #[fg=#fabd2f bg=default],#[fg=#665c54] #{pane_index}:#{pane_current_command} }"
 
 # Improve prefix+q pane indicators
 set -g display-panes-colour "#928374"
