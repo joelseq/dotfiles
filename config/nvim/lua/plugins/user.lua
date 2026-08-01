@@ -132,6 +132,10 @@ return {
   },
   "tpope/vim-obsession",
   {
+    "ThePrimeagen/refactoring.nvim",
+    dependencies = { "lewis6991/async.nvim" },
+  },
+  {
     "gaoDean/autolist.nvim",
     ft = {
       "markdown",

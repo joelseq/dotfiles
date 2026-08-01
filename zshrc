@@ -115,7 +115,7 @@ ZSH_TMUX_AUTOSTART='true'
 # alias zshconfig="mate ~/.zshrc"
 
 # Hub alias
-alias git="hub"
+command -v hub >/dev/null && alias git="hub"
 
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
@@ -124,8 +124,8 @@ export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:$GOBIN
 
-eval "$(direnv hook zsh)"
-[[ /usr/local/bin/kubectl ]] && source <(kubectl completion zsh)
+command -v direnv >/dev/null && eval "$(direnv hook zsh)"
+command -v kubectl >/dev/null && source <(kubectl completion zsh)
 
 prompt_context() {
   if [[ "$USER" != "$DEFAULT_USER" || -n "$SSH_CLIENT" ]]; then
@@ -135,22 +135,27 @@ prompt_context() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
+command -v fzf >/dev/null && source <(fzf --zsh)
 
 # Starship prompt
-eval "$(starship init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
 
 # Zsh syntax highlighting
-source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+if command -v brew >/dev/null; then
+  zsh_syntax_highlighting="$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  [[ -r "$zsh_syntax_highlighting" ]] && source "$zsh_syntax_highlighting"
 
-# Zsh autosuggestions
-source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  zsh_autosuggestions="$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  [[ -r "$zsh_autosuggestions" ]] && source "$zsh_autosuggestions"
+  unset zsh_syntax_highlighting zsh_autosuggestions
+fi
 
-neofetch
+# Show system info for top-level interactive shells, but skip tmux panes for speed.
+[[ -o interactive && -z "$TMUX" ]] && command -v neofetch >/dev/null && neofetch
 
 autoload -U +X bashcompinit && bashcompinit
-complete -o nospace -C /home/linuxbrew/.linuxbrew/Cellar/terraform/1.2.5/bin/terraform terraform
-. "/home/joelseq/.deno/env"
+command -v terraform >/dev/null && complete -o nospace -C "$(command -v terraform)" terraform
+[[ -r "/home/joelseq/.deno/env" ]] && . "/home/joelseq/.deno/env"
 # pnpm
 export PNPM_HOME="/home/joelseq/.local/share/pnpm"
 case ":$PATH:" in
@@ -160,7 +165,10 @@ esac
 # pnpm end
 
 # Orchestra
-eval "$(orchestra init zsh)"
+command -v orchestra >/dev/null && eval "$(orchestra init zsh)"
+
+# Mise
+command -v mise >/dev/null && eval "$(mise activate zsh)"
 
 # Source local machine-specific zsh configuration last so it overrides the above
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local

@@ -102,6 +102,7 @@ install_brew_packages() {
     zsh-autosuggestions
     tmux
     lazygit
+    git-delta
     yazi
     bat
     jq
@@ -330,7 +331,25 @@ install_nvim_plugins() {
 }
 
 # ---------------------------------------------------------------------------
-# 13. Apply transparent figma/figma git perf settings (Tier 1, idempotent).
+# 13. Configure global git defaults
+# ---------------------------------------------------------------------------
+configure_global_git() {
+  info "Configuring global git defaults..."
+
+  git config --global core.pager delta
+  git config --global interactive.diffFilter "delta --color-only"
+  git config --global delta.navigate true
+  git config --global delta.line-numbers true
+  git config --global delta.side-by-side true
+  git config --global delta.syntax-theme gruvbox-dark
+  git config --global merge.conflictstyle zdiff3
+  git config --global diff.colorMoved default
+
+  ok "Global git defaults configured"
+}
+
+# ---------------------------------------------------------------------------
+# 14. Apply transparent figma/figma git perf settings (Tier 1, idempotent).
 #     Tier 2 (destructive ref-restriction) is opt-in: run `git restrict-refs-figma`
 #     manually. Both scripts live in bin/ (on PATH as git subcommands).
 # ---------------------------------------------------------------------------
@@ -372,6 +391,7 @@ main() {
   run_dotbot
   install_nvim_plugins
   install_work_config
+  configure_global_git
   configure_figma_git
 
   echo ""
