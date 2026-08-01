@@ -426,6 +426,10 @@ bind-key -T copy-mode-vi 'C-l' select-pane -R
 # Orchestra - Claude Code session orchestrator (prefix + O)
 bind-key o display-popup -E -w 80% -h 80% "orchestra"
 
+# Extended keys for pi
+set -g extended-keys on
+set -g extended-keys-format csi-u
+
 # -- custom variables ----------------------------------------------------------
 
 # to define a custom #{foo} variable, define a POSIX shell function between the

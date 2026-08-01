@@ -36,6 +36,21 @@
     ~/.claude/CLAUDE.md: config/claude/CLAUDE.md
     ~/.claude/settings.json: config/claude/settings.json
     ~/.claude/statusline-command.sh: config/claude/statusline-command.sh
+    ~/.pi/agent/settings.json:
+      create: true
+      path: config/pi/agent/settings.json
+    ~/.pi/agent/extensions:
+      create: true
+      path: config/pi/agent/extensions
+    ~/.pi/agent/themes:
+      create: true
+      path: config/pi/agent/themes
+    ~/.pi/agent/prompts:
+      create: true
+      path: config/pi/agent/prompts
+    ~/.pi/agent/skills:
+      create: true
+      path: config/pi/agent/skills
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]
