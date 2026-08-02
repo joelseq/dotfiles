@@ -1,0 +1,140 @@
+# herdr configuration
+# Tracked in dotfiles and symlinked to ~/.config/herdr/config.toml by Dotbot.
+# Reload after changes with: herdr server reload-config
+
+onboarding = false
+
+[theme]
+# Matches the tmux gruvbox plugin preference.
+name = "gruvbox"
+
+[theme.custom]
+# Pull the important tmux colors across, especially the active-pane yellow.
+accent = "#fabd2f"
+yellow = "#fabd2f"
+blue = "#83a598"
+green = "#b8bb26"
+red = "#fb4934"
+panel_bg = "#1d2021"
+surface0 = "#282828"
+surface1 = "#3c3836"
+overlay0 = "#665c54"
+text = "#ebdbb2"
+subtext0 = "#928374"
+
+[terminal]
+# Closest Herdr equivalent to tmux_conf_new_pane_retain_current_path=true.
+# Herdr applies this to panes, tabs, and workspaces when there is a source.
+new_cwd = "follow"
+shell_mode = "auto"
+
+[keys]
+# tmux primary prefix is Ctrl-b. Your tmux also has Ctrl-a as prefix2, but Herdr
+# only has one prefix; change this to "ctrl+a" if you decide you prefer that.
+prefix = "ctrl+a"
+
+# General/session actions.
+help = "prefix+?"
+settings = "prefix+s"
+detach = "prefix+q"
+reload_config = "prefix+r"                  # tmux: prefix+r reloads config
+resize_mode = "prefix+shift+r"              # moved off prefix+r to keep reload muscle memory
+open_notification_target = "prefix+shift+o"
+
+# Workspaces are the closest analogue to tmux sessions.
+workspace_picker = ["prefix+w", "prefix+ctrl+f"]
+goto = "prefix+g"
+new_workspace = ["prefix+shift+n", "prefix+ctrl+c"]
+rename_workspace = "prefix+shift+w"
+close_workspace = "prefix+shift+d"
+previous_workspace = "prefix+shift+left"
+next_workspace = "prefix+shift+right"
+switch_workspace = "prefix+shift+1..9"
+
+# Git worktrees.
+new_worktree = "prefix+shift+g"
+open_worktree = "prefix+alt+g"
+remove_worktree = "prefix+alt+shift+g"
+
+# Agent sidebar navigation.
+previous_agent = "prefix+alt+up"
+next_agent = "prefix+alt+down"
+focus_agent = "prefix+alt+1..9"
+
+# Tabs are the closest analogue to tmux windows.
+new_tab = "prefix+c"
+rename_tab = "prefix+shift+t"
+previous_tab = ["prefix+p", "prefix+ctrl+h"]
+next_tab = ["prefix+n", "prefix+ctrl+l"]
+switch_tab = "prefix+1..9"                   # matches tmux base-index=1 habit
+close_tab = "prefix+shift+x"
+
+# Pane actions. Direct Ctrl-h/j/k/l vim-aware navigation from tmux cannot be
+# replicated safely here; un-prefixed Herdr bindings would steal those keys from
+# shells and editors. Prefix+h/j/k/l and navigate-mode h/j/k/l keep the muscle
+# memory without intercepting normal terminal input.
+rename_pane = "prefix+shift+p"
+edit_scrollback = "prefix+e"
+copy_mode = ["prefix+[", "prefix+enter"]
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+swap_pane_left = "prefix+shift+h"
+swap_pane_down = "prefix+shift+j"
+swap_pane_up = "prefix+shift+k"
+swap_pane_right = "prefix+shift+l"
+cycle_pane_next = "prefix+tab"
+cycle_pane_previous = "prefix+shift+tab"
+last_pane = "prefix+semicolon"
+split_horizontal = "prefix+minus" # tmux: prefix+- split stacked
+split_vertical = [
+  "prefix+v",
+  "prefix+shift+minus",
+] # tmux: prefix+_ split side-by-side
+close_pane = "prefix+x"
+zoom = ["prefix+z", "prefix+plus"] # tmux: prefix++ maximize pane
+toggle_sidebar = "prefix+b"
+
+# Navigate-mode movement. In prefix+w workspace navigation, j/k move the
+# workspace selection. h/l can still move between panes; vertical pane movement
+# in navigate mode uses arrows to avoid stealing j/k from workspace navigation.
+navigate_workspace_up = "k"
+navigate_workspace_down = "j"
+navigate_pane_left = "h"
+navigate_pane_down = "down"
+navigate_pane_up = "up"
+navigate_pane_right = "l"
+
+# tmux: prefix+o opens orchestra in an 80% popup.
+[[keys.command]]
+key = "prefix+o"
+type = "popup"
+command = "orchestra"
+description = "run orchestra"
+width = "80%"
+height = "80%"
+
+[ui]
+mouse_capture = true
+copy_on_select = true
+confirm_close = true
+prompt_new_tab_name = false
+prompt_new_workspace_name = false
+pane_borders = true
+pane_gaps = true
+show_agent_labels_on_pane_borders = true
+accent = "#fabd2f"
+
+[ui.toast]
+delivery = "herdr"
+delay_seconds = 1
+
+[ui.toast.herdr]
+position = "bottom-right"
+
+[session]
+resume_agents_on_restore = true
+
+[experimental]
+pane_history = false

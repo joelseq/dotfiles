@@ -26,6 +26,9 @@
     ~/.config/ghostty:
       create: true
       path: config/ghostty
+    ~/.config/herdr/config.toml:
+      create: true
+      path: config/herdr/config.toml
     ~/.config/lazygit:
       create: true
       path: config/lazygit
