@@ -29,6 +29,9 @@
     ~/.config/herdr/config.toml:
       create: true
       path: config/herdr/config.toml
+    ~/.config/herdr/plugins/config/persiyanov.reviewr/config.toml:
+      create: true
+      path: config/herdr/plugins/config/persiyanov.reviewr/config.toml
     ~/.config/lazygit:
       create: true
       path: config/lazygit

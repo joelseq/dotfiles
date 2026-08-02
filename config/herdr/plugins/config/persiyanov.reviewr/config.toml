@@ -1,0 +1,12 @@
+# reviewr plugin configuration
+# Docs: ~/.config/herdr/plugins/github/*reviewr*/README.md#configuration
+
+# Open/toggle reviewr in a dedicated Herdr tab instead of a split beside the
+# current pane. The plugin renames the created tab to "reviewr".
+toggle_placement = "tab"
+
+# Keep automatic worktree-created opens enabled, but now they also open as tabs.
+auto_open = true
+
+# Match the rest of the Herdr/tmux theme.
+theme = "gruvbox"
