@@ -69,6 +69,8 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
+# Keep tmux helpers/keybindings, but don't auto-start tmux when zsh loads.
+ZSH_TMUX_AUTOSTART='false'
 plugins=(git colored-man-pages colorize pip python brew macos tmux tmuxinator history vi-mode)
 
 # if [ -z "$_zsh_custom_scripts_loaded" ]; then
@@ -84,9 +86,6 @@ source ~/env.sh
 # User configuration
 
 # source ~/.fonts/*.sh
-
-# zsh tmux settings
-ZSH_TMUX_AUTOSTART='true'
 
 # export MANPATH="/usr/local/man:$MANPATH"
 

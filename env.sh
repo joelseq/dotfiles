@@ -80,6 +80,46 @@ function tms() {
 	mux s project --name=${selected_name} "$folder"
 }
 
+# Quickly create/focus a Herdr workspace in a project directory
+function hdw() {
+	local folder selected_name existing workspace_out workspace_id agent_tab agent_pane editor_out editor_pane terms_out terms_pane
+
+	if [[ -n "$1" ]]; then
+		folder="$1"
+	else
+		folder=$(find ~/Code -mindepth 1 -maxdepth 3 -type d | fzf)
+	fi
+	[[ -z "$folder" ]] && return 1
+
+	selected_name=$(basename "$folder" | tr . _)
+	existing=$(herdr workspace list | jq -r --arg name "$selected_name" '.result.workspaces[]? | select(.label == $name) | .workspace_id' | head -n1)
+
+	if [[ -n "$existing" ]]; then
+		herdr workspace focus "$existing" >/dev/null
+	else
+		workspace_out=$(herdr workspace create --cwd "$folder" --label "$selected_name" --focus)
+		workspace_id=$(jq -r '.result.workspace.workspace_id' <<<"$workspace_out")
+		agent_tab=$(jq -r '.result.tab.tab_id' <<<"$workspace_out")
+		agent_pane=$(jq -r '.result.root_pane.pane_id' <<<"$workspace_out")
+
+		herdr tab rename "$agent_tab" agent >/dev/null
+		herdr pane rename "$agent_pane" agent >/dev/null
+
+		editor_out=$(herdr tab create --workspace "$workspace_id" --cwd "$folder" --label editor --no-focus)
+		editor_pane=$(jq -r '.result.root_pane.pane_id' <<<"$editor_out")
+		herdr pane run "$editor_pane" nvim
+
+		terms_out=$(herdr tab create --workspace "$workspace_id" --cwd "$folder" --label terms --no-focus)
+		terms_pane=$(jq -r '.result.root_pane.pane_id' <<<"$terms_out")
+		herdr pane split "$terms_pane" --direction right --ratio 0.5 --cwd "$folder" --no-focus >/dev/null
+
+		herdr tab focus "$agent_tab" >/dev/null
+	fi
+
+	# If called outside Herdr, attach/open the Herdr client after preparing the workspace.
+	[[ -z "$HERDR_ENV" ]] && herdr
+}
+
 # fbr - checkout git branch (including remote branches)
 function fbra() {
 	local branches branch
