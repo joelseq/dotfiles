@@ -7,27 +7,28 @@ git:
 gui:
   nerdFontsVersion: "3"
   theme:
+    # Gruvbox dark, aligned with tmux/Herdr colors.
     activeBorderColor:
-      - "#ff9e64"
+      - "#fabd2f"
       - "bold"
     inactiveBorderColor:
-      - "#27a1b9"
+      - "#665c54"
     searchingActiveBorderColor:
-      - "#ff9e64"
+      - "#fabd2f"
       - "bold"
     optionsTextColor:
-      - "#7aa2f7"
+      - "#83a598"
     selectedLineBgColor:
-      - "#283457"
+      - "#3c3836"
     cherryPickedCommitFgColor:
-      - "#7aa2f7"
+      - "#83a598"
     cherryPickedCommitBgColor:
-      - "#bb9af7"
+      - "#d3869b"
     markedBaseCommitFgColor:
-      - "#7aa2f7"
+      - "#83a598"
     markedBaseCommitBgColor:
-      - "#e0af68"
+      - "#fe8019"
     unstagedChangesColor:
-      - "#db4b4b"
+      - "#fb4934"
     defaultFgColor:
-      - "#c0caf5"
+      - "#ebdbb2"
