@@ -155,3 +155,11 @@ description = "open file viewer in tab"
 key = "prefix+o"
 type = "plugin_action"
 command = "persiyanov.reviewr.toggle" # <plugin_id>.<action_id> — note the id, not the name
+
+[[keys.command]]
+key = "prefix+u"
+type = "popup"
+command = "lazygit"
+description = "open lazygit popup"
+width = "90%"
+height = "90%"

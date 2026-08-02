@@ -150,8 +150,8 @@ if command -v brew >/dev/null; then
   unset zsh_syntax_highlighting zsh_autosuggestions
 fi
 
-# Show system info for top-level interactive shells, but skip tmux panes for speed.
-[[ -o interactive && -z "$TMUX" ]] && command -v neofetch >/dev/null && neofetch
+# Show system info for top-level interactive shells, but skip tmux/Herdr panes for speed.
+[[ -o interactive && -z "$TMUX" && -z "$HERDR_ENV" ]] && command -v neofetch >/dev/null && neofetch
 
 autoload -U +X bashcompinit && bashcompinit
 command -v terraform >/dev/null && complete -o nospace -C "$(command -v terraform)" terraform
