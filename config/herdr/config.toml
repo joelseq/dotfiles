@@ -107,20 +107,20 @@ navigate_pane_up = "up"
 navigate_pane_right = "l"
 
 # tmux: prefix+o opens orchestra in an 80% popup.
-[[keys.command]]
-key = "prefix+o"
-type = "popup"
-command = "orchestra"
-description = "run orchestra"
-width = "80%"
-height = "80%"
+# [[keys.command]]
+# key = "prefix+o"
+# type = "popup"
+# command = "orchestra"
+# description = "run orchestra"
+# width = "80%"
+# height = "80%"
 
 [ui]
 mouse_capture = true
 copy_on_select = true
 confirm_close = true
-prompt_new_tab_name = false
-prompt_new_workspace_name = false
+prompt_new_tab_name = true
+prompt_new_workspace_name = true
 pane_borders = true
 pane_gaps = true
 show_agent_labels_on_pane_borders = true
@@ -150,3 +150,8 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer in tab"
+
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle" # <plugin_id>.<action_id> — note the id, not the name
