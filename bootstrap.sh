@@ -109,6 +109,7 @@ install_brew_packages() {
     tree-sitter-cli
     hub
     mise
+    herdr
   )
 
   brew install "${packages[@]}"
