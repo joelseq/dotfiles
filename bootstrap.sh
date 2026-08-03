@@ -143,15 +143,25 @@ install_brew_packages() {
 
 install_herdr() {
   local install_dir="$HOME/.local/bin"
+  local plugins=(
+    smarzban/herdr-file-viewer
+    persiyanov/herdr-reviewr
+  )
 
   if [[ -x "$install_dir/herdr" ]]; then
     ok "Herdr already installed at $install_dir/herdr"
-    return 0
+  else
+    info "Installing Herdr to $install_dir..."
+    curl -fsSL https://herdr.dev/install.sh | HERDR_INSTALL_DIR="$install_dir" sh
+    ok "Herdr installed"
   fi
 
-  info "Installing Herdr to $install_dir..."
-  curl -fsSL https://herdr.dev/install.sh | HERDR_INSTALL_DIR="$install_dir" sh
-  ok "Herdr installed"
+  local plugin
+  for plugin in "${plugins[@]}"; do
+    info "Installing Herdr plugin $plugin..."
+    "$install_dir/herdr" plugin install "$plugin" --yes
+  done
+  ok "Herdr plugins installed"
 }
 
 # ---------------------------------------------------------------------------

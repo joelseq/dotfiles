@@ -11,6 +11,12 @@ run_tests() {
   trap 'rm -rf "$BOOTSTRAP_TEST_DIR"' EXIT
   export HOME="$BOOTSTRAP_TEST_DIR/home"
   mkdir -p "$HOME"
+  BOOTSTRAP_PLUGIN_LOG="$BOOTSTRAP_TEST_DIR/plugin.log"
+  BOOTSTRAP_HERDR_STUB="$BOOTSTRAP_TEST_DIR/herdr-stub"
+  export BOOTSTRAP_PLUGIN_LOG BOOTSTRAP_HERDR_STUB
+  : >"$BOOTSTRAP_PLUGIN_LOG"
+  printf '%s\n' '#!/usr/bin/env bash' 'echo "$*" >>"$BOOTSTRAP_PLUGIN_LOG"' >"$BOOTSTRAP_HERDR_STUB"
+  chmod +x "$BOOTSTRAP_HERDR_STUB"
 
   # Load function definitions without running bootstrap main.
   # shellcheck disable=SC1090
@@ -19,6 +25,7 @@ run_tests() {
   test_brew_does_not_install_herdr
   test_herdr_installs_directly
   test_existing_direct_herdr_skips_install
+  test_herdr_installs_plugins_every_run
   test_main_installs_herdr_after_brew
   printf 'bootstrap tests passed\n'
 }
@@ -52,6 +59,13 @@ test_existing_direct_herdr_skips_install() {
   install_herdr >/dev/null
 
   [[ "$(wc -l <"$BOOTSTRAP_CURL_LOG")" -eq 1 ]] || fail "existing direct install downloaded again"
+}
+
+test_herdr_installs_plugins_every_run() {
+  local expected
+  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes\nplugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes'
+
+  [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "Herdr plugins not installed every run"
 }
 
 test_main_installs_herdr_after_brew() {
@@ -94,7 +108,7 @@ curl() {
   printf '%s\n' \
     '#!/bin/sh' \
     'mkdir -p "$HERDR_INSTALL_DIR"' \
-    'touch "$HERDR_INSTALL_DIR/herdr"' \
+    'cp "$BOOTSTRAP_HERDR_STUB" "$HERDR_INSTALL_DIR/herdr"' \
     'chmod +x "$HERDR_INSTALL_DIR/herdr"'
 }
 
