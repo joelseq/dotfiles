@@ -39,8 +39,12 @@
     ~/.config/tmuxinator/figma.yml: config/tmuxinator/figma.yml
     ~/.config/tmuxinator/project.yml: config/tmuxinator/project.yml
     ~/.config/tmuxinator/wc.yml: config/tmuxinator/wc.yml
-    ~/.claude/CLAUDE.md: config/claude/CLAUDE.md
-    ~/.claude/settings.json: config/claude/settings.json
+    ~/.claude/CLAUDE.md:
+      path: config/claude/CLAUDE.md
+      if: "[ ! -L ~/.claude/CLAUDE.md ]"
+    ~/.claude/settings.json:
+      path: config/claude/settings.json
+      if: "[ ! -L ~/.claude/settings.json ]"
     ~/.claude/statusline-command.sh: config/claude/statusline-command.sh
     ~/.agents/skills:
       create: true
