@@ -133,6 +133,25 @@ prompt_context() {
   fi
 }
 
+_herdr_report_git_branch() {
+  [[ -n "${HERDR_WORKSPACE_ID:-}" ]] || return
+  command -v herdr >/dev/null || return
+
+  local branch
+  local -a branch_args
+  if branch="$(command git branch --show-current 2>/dev/null)" && [[ -n "$branch" ]]; then
+    branch_args=(--token "branch=$branch")
+  else
+    branch_args=(--clear-token branch)
+  fi
+
+  command herdr workspace report-metadata "$HERDR_WORKSPACE_ID" \
+    --source user:shell-git "${branch_args[@]}" >/dev/null 2>&1 || true
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _herdr_report_git_branch
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Set up fzf key bindings and fuzzy completion
 command -v fzf >/dev/null && source <(fzf --zsh)

@@ -35,6 +35,8 @@ run_tests() {
   test_herdr_installs_plugins_every_run
   test_herdr_plugin_failure_continues "$bootstrap"
   test_zshrc_adds_local_bin "$zshrc"
+  test_zshrc_reports_git_branch "$zshrc"
+  test_zshrc_clears_git_branch "$zshrc"
   test_main_installs_herdr_after_brew
   printf 'bootstrap tests passed\n'
 }
@@ -114,6 +116,49 @@ test_zshrc_adds_local_bin() {
   )"
 
   [[ ":$configured_path:" == *":$BOOTSTRAP_TEST_DIR/zsh-home/.local/bin:"* ]] || fail "zshrc does not add ~/.local/bin to PATH"
+}
+
+test_zshrc_reports_git_branch() {
+  local zshrc="$1"
+  local fake_bin="$BOOTSTRAP_TEST_DIR/fake-bin"
+  local metadata_log="$BOOTSTRAP_TEST_DIR/metadata.log"
+  mkdir -p "$fake_bin"
+  : >"$metadata_log"
+  printf '%s\n' '#!/bin/sh' 'printf '\''%s\n'\'' "$FAKE_GIT_BRANCH"' >"$fake_bin/git"
+  printf '%s\n' '#!/bin/sh' 'printf '\''%s\n'\'' "$*" >>"$HERDR_METADATA_LOG"' >"$fake_bin/herdr"
+  chmod +x "$fake_bin/git" "$fake_bin/herdr"
+
+  if ! HOME="$BOOTSTRAP_TEST_DIR/zsh-home" \
+    PATH="$fake_bin:/usr/bin:/bin" \
+    HERDR_WORKSPACE_ID="workspace-1" \
+    FAKE_GIT_BRANCH="feature/test" \
+    HERDR_METADATA_LOG="$metadata_log" \
+    zsh -dfc 'source "$1" >/dev/null 2>&1 || true; _herdr_report_git_branch' zsh "$zshrc"; then
+    fail "zshrc does not report Git branch metadata"
+  fi
+
+  [[ "$(cat "$metadata_log")" == "workspace report-metadata workspace-1 --source user:shell-git --token branch=feature/test" ]] || fail "wrong Git branch metadata"
+}
+
+test_zshrc_clears_git_branch() {
+  local zshrc="$1"
+  local fake_bin="$BOOTSTRAP_TEST_DIR/fake-clear-bin"
+  local metadata_log="$BOOTSTRAP_TEST_DIR/metadata-clear.log"
+  mkdir -p "$fake_bin"
+  : >"$metadata_log"
+  printf '%s\n' '#!/bin/sh' 'exit 1' >"$fake_bin/git"
+  printf '%s\n' '#!/bin/sh' 'printf '\''%s\n'\'' "$*" >>"$HERDR_METADATA_LOG"' >"$fake_bin/herdr"
+  chmod +x "$fake_bin/git" "$fake_bin/herdr"
+
+  if ! HOME="$BOOTSTRAP_TEST_DIR/zsh-home" \
+    PATH="$fake_bin:/usr/bin:/bin" \
+    HERDR_WORKSPACE_ID="workspace-1" \
+    HERDR_METADATA_LOG="$metadata_log" \
+    zsh -dfc 'source "$1" >/dev/null 2>&1 || true; _herdr_report_git_branch' zsh "$zshrc"; then
+    fail "zshrc does not clear Git branch metadata"
+  fi
+
+  [[ "$(cat "$metadata_log")" == "workspace report-metadata workspace-1 --source user:shell-git --clear-token branch" ]] || fail "stale Git branch metadata not cleared"
 }
 
 test_main_installs_herdr_after_brew() {
