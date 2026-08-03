@@ -109,7 +109,6 @@ install_brew_packages() {
     tree-sitter-cli
     hub
     mise
-    herdr
   )
 
   brew install "${packages[@]}"
@@ -140,6 +139,19 @@ install_brew_packages() {
   fi
 
   ok "Brew packages installed"
+}
+
+install_herdr() {
+  local install_dir="$HOME/.local/bin"
+
+  if [[ -x "$install_dir/herdr" ]]; then
+    ok "Herdr already installed at $install_dir/herdr"
+    return 0
+  fi
+
+  info "Installing Herdr to $install_dir..."
+  curl -fsSL https://herdr.dev/install.sh | HERDR_INSTALL_DIR="$install_dir" sh
+  ok "Herdr installed"
 }
 
 # ---------------------------------------------------------------------------
@@ -384,6 +396,7 @@ main() {
   install_prerequisites
   install_homebrew
   install_brew_packages
+  install_herdr
   install_oh_my_zsh
   install_nvm
   bridge_mise_rbenv
