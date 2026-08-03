@@ -37,6 +37,7 @@ run_tests() {
   test_zshrc_adds_local_bin "$zshrc"
   test_zshrc_reports_git_branch "$zshrc"
   test_zshrc_clears_git_branch "$zshrc"
+  test_zshrc_skips_branch_token_on_mirror_controller "$zshrc"
   test_main_installs_herdr_after_brew
   printf 'bootstrap tests passed\n'
 }
@@ -159,6 +160,27 @@ test_zshrc_clears_git_branch() {
   fi
 
   [[ "$(cat "$metadata_log")" == "workspace report-metadata workspace-1 --source user:shell-git --clear-token branch" ]] || fail "stale Git branch metadata not cleared"
+}
+
+test_zshrc_skips_branch_token_on_mirror_controller() {
+  local zshrc="$1"
+  local controller_home="$BOOTSTRAP_TEST_DIR/controller-home"
+  local fake_bin="$BOOTSTRAP_TEST_DIR/fake-controller-bin"
+  local metadata_log="$BOOTSTRAP_TEST_DIR/metadata-controller.log"
+  mkdir -p "$controller_home/.config/herdr-mirror" "$fake_bin"
+  touch "$controller_home/.config/herdr-mirror/hosts.toml"
+  : >"$metadata_log"
+  printf '%s\n' '#!/bin/sh' 'printf '\''%s\n'\'' feature/test' >"$fake_bin/git"
+  printf '%s\n' '#!/bin/sh' 'printf '\''%s\n'\'' "$*" >>"$HERDR_METADATA_LOG"' >"$fake_bin/herdr"
+  chmod +x "$fake_bin/git" "$fake_bin/herdr"
+
+  HOME="$controller_home" \
+    PATH="$fake_bin:/usr/bin:/bin" \
+    HERDR_WORKSPACE_ID="workspace-1" \
+    HERDR_METADATA_LOG="$metadata_log" \
+    zsh -dfc 'source "$1" >/dev/null 2>&1 || true; _herdr_report_git_branch' zsh "$zshrc"
+
+  [[ ! -s "$metadata_log" ]] || fail "mirror controller reported duplicate branch token"
 }
 
 test_main_installs_herdr_after_brew() {

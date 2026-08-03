@@ -135,6 +135,7 @@ prompt_context() {
 
 _herdr_report_git_branch() {
   [[ -n "${HERDR_WORKSPACE_ID:-}" ]] || return
+  [[ ! -f "$HOME/.config/herdr-mirror/hosts.toml" ]] || return 0
   command -v herdr >/dev/null || return
 
   local branch
