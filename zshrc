@@ -10,6 +10,7 @@ export PATH="$HOME/homebrew/bin:$HOME/homebrew/sbin:$PATH"
 
 # dotfiles helper scripts (git-enable-fsmonitor, etc.)
 export PATH="$HOME/dotfiles/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,

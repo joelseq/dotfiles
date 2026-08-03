@@ -159,9 +159,11 @@ install_herdr() {
   local plugin
   for plugin in "${plugins[@]}"; do
     info "Installing Herdr plugin $plugin..."
-    "$install_dir/herdr" plugin install "$plugin" --yes
+    if ! "$install_dir/herdr" plugin install "$plugin" --yes; then
+      error "Failed to install Herdr plugin $plugin; continuing"
+    fi
   done
-  ok "Herdr plugins installed"
+  info "Herdr plugin installation finished"
 }
 
 # ---------------------------------------------------------------------------

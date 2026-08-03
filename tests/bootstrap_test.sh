@@ -2,9 +2,10 @@
 set -euo pipefail
 
 run_tests() {
-  local repo_root bootstrap
+  local repo_root bootstrap zshrc
   repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   bootstrap="$repo_root/bootstrap.sh"
+  zshrc="$repo_root/zshrc"
 
   BOOTSTRAP_TEST_DIR="$(mktemp -d)"
   export BOOTSTRAP_TEST_DIR
@@ -15,7 +16,13 @@ run_tests() {
   BOOTSTRAP_HERDR_STUB="$BOOTSTRAP_TEST_DIR/herdr-stub"
   export BOOTSTRAP_PLUGIN_LOG BOOTSTRAP_HERDR_STUB
   : >"$BOOTSTRAP_PLUGIN_LOG"
-  printf '%s\n' '#!/usr/bin/env bash' 'echo "$*" >>"$BOOTSTRAP_PLUGIN_LOG"' >"$BOOTSTRAP_HERDR_STUB"
+  printf '%s\n' \
+    '#!/usr/bin/env bash' \
+    'echo "$*" >>"$BOOTSTRAP_PLUGIN_LOG"' \
+    'if [[ "${BOOTSTRAP_FAIL_PLUGIN:-}" == "$3" ]]; then' \
+    '  echo "plugin install failed" >&2' \
+    '  exit 1' \
+    'fi' >"$BOOTSTRAP_HERDR_STUB"
   chmod +x "$BOOTSTRAP_HERDR_STUB"
 
   # Load function definitions without running bootstrap main.
@@ -26,6 +33,8 @@ run_tests() {
   test_herdr_installs_directly
   test_existing_direct_herdr_skips_install
   test_herdr_installs_plugins_every_run
+  test_herdr_plugin_failure_continues "$bootstrap"
+  test_zshrc_adds_local_bin "$zshrc"
   test_main_installs_herdr_after_brew
   printf 'bootstrap tests passed\n'
 }
@@ -66,6 +75,45 @@ test_herdr_installs_plugins_every_run() {
   expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes\nplugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes'
 
   [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "Herdr plugins not installed every run"
+}
+
+test_herdr_plugin_failure_continues() {
+  local bootstrap="$1"
+  local expected output status
+  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes'
+  : >"$BOOTSTRAP_PLUGIN_LOG"
+  export BOOTSTRAP_FAIL_PLUGIN="smarzban/herdr-file-viewer"
+
+  set +e
+  output="$(bash -s -- "$bootstrap" 2>&1 <<'SCRIPT'
+set -euo pipefail
+bootstrap="$1"
+source <(sed '$d' "$bootstrap")
+install_herdr
+printf 'continued\n'
+SCRIPT
+)"
+  status=$?
+  set -e
+  unset BOOTSTRAP_FAIL_PLUGIN
+
+  [[ "$status" -eq 0 ]] || fail "plugin failure stopped bootstrap"
+  [[ "$output" == *"continued"* ]] || fail "bootstrap did not continue after plugin failure"
+  [[ "$output" == *"Failed to install Herdr plugin smarzban/herdr-file-viewer; continuing"* ]] || fail "plugin failure error missing"
+  [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "later plugin skipped after failure"
+}
+
+test_zshrc_adds_local_bin() {
+  local zshrc="$1"
+  local configured_path
+  configured_path="$(
+    HOME="$BOOTSTRAP_TEST_DIR/zsh-home" PATH="/usr/bin:/bin" zsh -dfc '
+      source "$1" >/dev/null 2>&1 || true
+      print -r -- "$PATH"
+    ' zsh "$zshrc"
+  )"
+
+  [[ ":$configured_path:" == *":$BOOTSTRAP_TEST_DIR/zsh-home/.local/bin:"* ]] || fail "zshrc does not add ~/.local/bin to PATH"
 }
 
 test_main_installs_herdr_after_brew() {
