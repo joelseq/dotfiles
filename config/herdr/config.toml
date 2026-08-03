@@ -62,7 +62,7 @@ next_agent = "prefix+alt+down"
 focus_agent = "prefix+alt+1..9"
 
 # Tabs are the closest analogue to tmux windows.
-new_tab = "prefix+c"
+new_tab = "prefix+shift+c"
 rename_tab = "prefix+shift+t"
 previous_tab = ["prefix+p", "prefix+ctrl+h"]
 next_tab = ["prefix+n", "prefix+ctrl+l"]
@@ -87,11 +87,8 @@ swap_pane_right = "prefix+shift+l"
 cycle_pane_next = "prefix+tab"
 cycle_pane_previous = "prefix+shift+tab"
 last_pane = "prefix+semicolon"
-split_horizontal = "prefix+minus" # tmux: prefix+- split stacked
-split_vertical = [
-  "prefix+v",
-  "prefix+shift+minus",
-] # tmux: prefix+_ split side-by-side
+split_horizontal = "prefix+shift+minus"
+split_vertical = "prefix+shift+v"
 close_pane = "prefix+x"
 zoom = ["prefix+z", "prefix+plus"] # tmux: prefix++ maximize pane
 toggle_sidebar = "prefix+b"
@@ -150,6 +147,30 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer in tab"
+
+[[keys.command]]
+key = "prefix+c"
+type = "plugin_action"
+command = "mirror.remote-new-tab"
+description = "create context-aware tab"
+
+[[keys.command]]
+key = "prefix+alt+n"
+type = "plugin_action"
+command = "mirror.remote-new-workspace"
+description = "create remote workspace"
+
+[[keys.command]]
+key = "prefix+v"
+type = "plugin_action"
+command = "mirror.remote-split-right"
+description = "split context-aware pane right"
+
+[[keys.command]]
+key = "prefix+minus"
+type = "plugin_action"
+command = "mirror.remote-split-down"
+description = "split context-aware pane down"
 
 [[keys.command]]
 key = "prefix+o"
