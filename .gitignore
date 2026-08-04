@@ -1,1 +1,2 @@
 config/nvim/plugin/packer_compiled.lua
+config/pi/agent/extensions/*/node_modules/
