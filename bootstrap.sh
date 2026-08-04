@@ -293,7 +293,49 @@ backup_existing_dotfiles() {
 }
 
 # ---------------------------------------------------------------------------
-# 10. Install work-config overlay
+# 10. Install or update portable work state
+# ---------------------------------------------------------------------------
+install_work_state() {
+  local work_state_dir="$HOME/Code/work-state"
+  local repo_url="git@github.com:figma/joelseqfigma-work-state.git"
+
+  if [[ -d "$work_state_dir/.git" ]]; then
+    if [[ -n "$(git -C "$work_state_dir" status --porcelain)" ]]; then
+      warn "work-state has local changes; skipping update"
+    else
+      info "Pulling latest work-state..."
+      if git -C "$work_state_dir" pull --ff-only; then
+        ok "work-state updated"
+      else
+        warn "work-state pull failed; continuing with existing checkout"
+      fi
+    fi
+  elif [[ -e "$work_state_dir" ]]; then
+    error "$work_state_dir exists but is not a Git repository"
+    return 1
+  else
+    info "Cloning work-state..."
+    mkdir -p "$HOME/Code"
+
+    if command -v gh &>/dev/null; then
+      gh repo clone figma/joelseqfigma-work-state "$work_state_dir"
+    else
+      git clone "$repo_url" "$work_state_dir"
+    fi
+
+    ok "work-state cloned"
+  fi
+
+  info "Validating work-state..."
+  if "$work_state_dir/bin/statectl" validate; then
+    ok "work-state valid"
+  else
+    warn "work-state validation failed"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# 11. Install work-config overlay
 # ---------------------------------------------------------------------------
 install_work_config() {
   local work_config_dir="$HOME/Code/work-config"
@@ -323,7 +365,7 @@ install_work_config() {
 }
 
 # ---------------------------------------------------------------------------
-# 11. Run dotbot (./install)
+# 12. Run dotbot (./install)
 # ---------------------------------------------------------------------------
 run_dotbot() {
   info "Running dotbot to symlink dotfiles..."
@@ -335,7 +377,7 @@ run_dotbot() {
 }
 
 # ---------------------------------------------------------------------------
-# 12. Install neovim plugins
+# 13. Install neovim plugins
 # ---------------------------------------------------------------------------
 install_nvim_plugins() {
   if ! command -v nvim &>/dev/null; then
@@ -356,7 +398,7 @@ install_nvim_plugins() {
 }
 
 # ---------------------------------------------------------------------------
-# 13. Configure global git defaults
+# 14. Configure global git defaults
 # ---------------------------------------------------------------------------
 configure_global_git() {
   info "Configuring global git defaults..."
@@ -374,7 +416,7 @@ configure_global_git() {
 }
 
 # ---------------------------------------------------------------------------
-# 14. Apply transparent figma/figma git perf settings (Tier 1, idempotent).
+# 15. Apply transparent figma/figma git perf settings (Tier 1, idempotent).
 #     Tier 2 (destructive ref-restriction) is opt-in: run `git restrict-refs-figma`
 #     manually. Both scripts live in bin/ (on PATH as git subcommands).
 # ---------------------------------------------------------------------------
@@ -416,6 +458,7 @@ main() {
   backup_existing_dotfiles
   run_dotbot
   install_nvim_plugins
+  install_work_state
   install_work_config
   configure_global_git
   configure_figma_git
