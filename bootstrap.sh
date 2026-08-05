@@ -73,7 +73,7 @@ install_homebrew() {
   fi
 
   info "Installing Homebrew..."
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   if [[ -x /home/linuxbrew/.linuxbrew/bin/brew ]]; then
     eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -89,6 +89,9 @@ install_homebrew() {
 # ---------------------------------------------------------------------------
 install_brew_packages() {
   info "Installing brew packages..."
+
+  # Homebrew defaults to asking before installs; bootstrap must run unattended.
+  export HOMEBREW_NO_ASK=1
 
   local packages=(
     neovim
