@@ -148,6 +148,7 @@ install_herdr() {
   local install_dir="$HOME/.local/bin"
   local plugins=(
     smarzban/herdr-file-viewer
+    nikok6/herdr-mirror
     persiyanov/herdr-reviewr
   )
 
@@ -166,7 +167,55 @@ install_herdr() {
       error "Failed to install Herdr plugin $plugin; continuing"
     fi
   done
+  patch_herdr_mirror "$install_dir/herdr"
   info "Herdr plugin installation finished"
+}
+
+patch_herdr_mirror() {
+  local herdr_bin="$1"
+  local patch_file="$DOTFILES_DIR/patches/herdr-mirror-mouse-grab.patch"
+  local cargo_bin plugin_root rustc_bin
+
+  if [[ ! -f "$patch_file" ]]; then
+    warn "Skipping Herdr Mirror mouse patch (patch file missing); official binary installed"
+    return 0
+  fi
+  if command -v brew &>/dev/null && [[ -x "$(brew --prefix)/bin/cargo" ]]; then
+    cargo_bin="$(brew --prefix)/bin/cargo"
+  else
+    cargo_bin="$(command -v cargo || true)"
+  fi
+  rustc_bin="$(dirname "${cargo_bin:-/missing}")/rustc"
+  [[ -x "$rustc_bin" ]] || rustc_bin="$(command -v rustc || true)"
+  if [[ -z "$cargo_bin" || -z "$rustc_bin" ]] || ! command -v patch &>/dev/null; then
+    warn "Skipping Herdr Mirror mouse patch (need cargo, rustc, and patch); official binary installed"
+    return 0
+  fi
+
+  plugin_root="$("$herdr_bin" plugin list --plugin mirror --json 2>/dev/null \
+    | jq -r '.result.plugins[]? | select(.plugin_id == "mirror") | .plugin_root' \
+    | head -n1)"
+  if [[ -z "$plugin_root" ]]; then
+    warn "Skipping Herdr Mirror mouse patch (plugin root unavailable)"
+    return 0
+  fi
+
+  if patch --dry-run --silent --forward -d "$plugin_root" -p1 <"$patch_file" \
+    &>/dev/null; then
+    patch --silent --forward -d "$plugin_root" -p1 <"$patch_file"
+  elif ! patch --dry-run --silent --reverse -d "$plugin_root" -p1 <"$patch_file" \
+    &>/dev/null; then
+    warn "Skipping Herdr Mirror mouse patch (upstream changed); official binary retained"
+    return 0
+  fi
+
+  info "Building patched Herdr Mirror..."
+  if RUSTC="$rustc_bin" "$cargo_bin" build --release --locked \
+    --manifest-path "$plugin_root/Cargo.toml"; then
+    ok "Herdr Mirror mouse patch installed"
+  else
+    warn "Herdr Mirror mouse patch build failed; official binary retained"
+  fi
 }
 
 # ---------------------------------------------------------------------------
