@@ -13,11 +13,9 @@ run_tests() {
   export HOME="$BOOTSTRAP_TEST_DIR/home"
   mkdir -p "$HOME"
   BOOTSTRAP_PLUGIN_LOG="$BOOTSTRAP_TEST_DIR/plugin.log"
-  BOOTSTRAP_PATCH_LOG="$BOOTSTRAP_TEST_DIR/patch.log"
   BOOTSTRAP_HERDR_STUB="$BOOTSTRAP_TEST_DIR/herdr-stub"
-  export BOOTSTRAP_PLUGIN_LOG BOOTSTRAP_PATCH_LOG BOOTSTRAP_HERDR_STUB
+  export BOOTSTRAP_PLUGIN_LOG BOOTSTRAP_HERDR_STUB
   : >"$BOOTSTRAP_PLUGIN_LOG"
-  : >"$BOOTSTRAP_PATCH_LOG"
   printf '%s\n' \
     '#!/usr/bin/env bash' \
     'echo "$*" >>"$BOOTSTRAP_PLUGIN_LOG"' \
@@ -30,13 +28,11 @@ run_tests() {
   # Load function definitions without running bootstrap main.
   # shellcheck disable=SC1090
   source <(sed '$d' "$bootstrap")
-  patch_herdr_mirror() { printf '%s\n' "$1" >>"$BOOTSTRAP_PATCH_LOG"; }
 
   test_brew_does_not_install_herdr
   test_herdr_installs_directly
   test_existing_direct_herdr_skips_install
   test_herdr_installs_plugins_every_run
-  test_herdr_repatches_mirror_every_run
   test_herdr_plugin_failure_continues "$bootstrap"
   test_zshrc_adds_local_bin "$zshrc"
   test_zshrc_reports_git_branch "$zshrc"
@@ -84,13 +80,6 @@ test_herdr_installs_plugins_every_run() {
   [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "Herdr plugins not installed every run"
 }
 
-test_herdr_repatches_mirror_every_run() {
-  local expected="$HOME/.local/bin/herdr"
-  expected="$expected"$'\n'"$expected"
-
-  [[ "$(cat "$BOOTSTRAP_PATCH_LOG")" == "$expected" ]] || fail "Herdr Mirror not patched every run"
-}
-
 test_herdr_plugin_failure_continues() {
   local bootstrap="$1"
   local expected output status
@@ -103,7 +92,6 @@ test_herdr_plugin_failure_continues() {
 set -euo pipefail
 bootstrap="$1"
 source <(sed '$d' "$bootstrap")
-patch_herdr_mirror() { :; }
 install_herdr
 printf 'continued\n'
 SCRIPT
