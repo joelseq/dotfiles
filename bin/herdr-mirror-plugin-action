@@ -1,0 +1,267 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+main() {
+  if [[ $# -ne 2 ]]; then
+    fail "usage: herdr-mirror-plugin-action <plugin-id> <action-id>"
+  fi
+
+  local plugin_id="$1"
+  local action_id="$2"
+  local local_workspace_id="${HERDR_ACTIVE_WORKSPACE_ID:-}"
+  local local_pane_id="${HERDR_ACTIVE_PANE_ID:-}"
+  local local_tab_id="${HERDR_ACTIVE_TAB_ID:-}"
+
+  [[ -n "$local_workspace_id" ]] || fail "missing active Herdr workspace"
+
+  resolve_local_socket
+  resolve_target "$local_workspace_id" "$local_pane_id" "$local_tab_id"
+  load_target_context
+  focus_target
+  invoke_action "$plugin_id" "$action_id"
+  follow_remote_focus
+}
+
+fail() {
+  local message="$1"
+  command herdr notification show "Plugin action failed" --body "$message" --sound request \
+    >/dev/null 2>&1 || true
+  printf 'herdr-mirror-plugin-action: %s\n' "$message" >&2
+  exit 1
+}
+
+resolve_local_socket() {
+  if [[ -n "${HERDR_SOCKET_PATH:-}" ]]; then
+    local_socket="$HERDR_SOCKET_PATH"
+    return
+  fi
+
+  local status
+  status="$(command herdr status --json 2>/dev/null)" || fail "cannot inspect local Herdr"
+  local_socket="$(jq -r '.server.socket // empty' <<<"$status")"
+  [[ -n "$local_socket" ]] || fail "cannot resolve local Herdr socket"
+}
+
+resolve_target() {
+  local local_workspace_id="$1"
+  local local_pane_id="$2"
+  local local_tab_id="$3"
+  local state_dir="$HOME/.local/state/herdr-mirror"
+
+  target_socket="$local_socket"
+  target_workspace_id="$local_workspace_id"
+  target_pane_id="$local_pane_id"
+  target_tab_id="$local_tab_id"
+  target_name="local"
+  target_map=""
+
+  local map remote_workspace_id remote_pane_id remote_tab_id host
+  for map in "$state_dir"/*-map.json; do
+    [[ -f "$map" ]] || continue
+    remote_workspace_id="$(jq -r --arg id "$local_workspace_id" '
+      .workspaces | to_entries[]?
+      | select(.value.localId == $id and ((.value.tombstone // false) | not))
+      | .key
+    ' "$map" | head -n1)"
+    [[ -n "$remote_workspace_id" ]] || continue
+
+    remote_pane_id=""
+    if [[ -n "$local_pane_id" ]]; then
+      remote_pane_id="$(jq -r --arg id "$local_pane_id" '
+        .panes | to_entries[]?
+        | select(.value.localId == $id and ((.value.tombstone // false) | not))
+        | .key
+      ' "$map" | head -n1)"
+    fi
+
+    remote_tab_id=""
+    if [[ -n "$local_tab_id" ]]; then
+      remote_tab_id="$(jq -r --arg id "$local_tab_id" '
+        .tabs | to_entries[]?
+        | select(.value.localId == $id)
+        | .key
+      ' "$map" | head -n1)"
+    fi
+
+    host="$(basename "$map" -map.json)"
+    target_socket="$state_dir/$host-api.sock"
+    target_workspace_id="$remote_workspace_id"
+    target_pane_id="$remote_pane_id"
+    target_tab_id="$remote_tab_id"
+    target_name="$host"
+    target_map="$map"
+    [[ -S "$target_socket" ]] || fail "mirror API unavailable for $host"
+    return
+  done
+}
+
+load_target_context() {
+  local response error snapshot pane tab workspace cwd
+  response="$(snapshot_request)"
+  error="$(api_error "$response")"
+  [[ -z "$error" ]] || fail "$target_name session.snapshot: $error"
+  snapshot="$(jq -c '.result.snapshot // empty' <<<"$response")"
+  [[ -n "$snapshot" ]] || fail "$target_name session.snapshot returned no snapshot"
+
+  pane="$(jq -c --arg id "$target_pane_id" '.panes[]? | select(.pane_id == $id)' \
+    <<<"$snapshot" | head -n1)"
+  if [[ -n "$pane" ]]; then
+    target_tab_id="$(jq -r '.tab_id // empty' <<<"$pane")"
+    cwd="$(jq -r '.foreground_cwd // .cwd // empty' <<<"$pane")"
+  else
+    cwd=""
+  fi
+
+  tab="$(jq -c --arg id "$target_tab_id" '.tabs[]? | select(.tab_id == $id)' \
+    <<<"$snapshot" | head -n1)"
+  workspace="$(jq -c --arg id "$target_workspace_id" \
+    '.workspaces[]? | select(.workspace_id == $id)' <<<"$snapshot" | head -n1)"
+  initial_active_tab_id="$(jq -r '.active_tab_id // empty' <<<"${workspace:-{}}")"
+
+  [[ -n "$cwd" ]] || cwd="$(jq -r '.cwd // .worktree.checkout_path // empty' \
+    <<<"${workspace:-{}}")"
+
+  action_context="$(jq -cn \
+    --arg workspace_id "$target_workspace_id" \
+    --arg workspace_label "$(jq -r '.label // empty' <<<"${workspace:-{}}")" \
+    --arg workspace_cwd "$cwd" \
+    --arg tab_id "$target_tab_id" \
+    --arg tab_label "$(jq -r '.label // empty' <<<"${tab:-{}}")" \
+    --arg pane_id "$target_pane_id" \
+    --arg pane_cwd "$cwd" \
+    '{
+      invocation_source: "keybinding",
+      workspace_id: $workspace_id,
+      workspace_label: $workspace_label,
+      workspace_cwd: $workspace_cwd,
+      tab_id: (if $tab_id == "" then null else $tab_id end),
+      tab_label: (if $tab_label == "" then null else $tab_label end),
+      focused_pane_id: (if $pane_id == "" then null else $pane_id end),
+      focused_pane_cwd: (if $pane_cwd == "" then null else $pane_cwd end)
+    }')"
+}
+
+invoke_action() {
+  local plugin_id="$1"
+  local action_id="$2"
+  local params response error
+
+  params="$(jq -cn \
+    --arg plugin_id "$plugin_id" \
+    --arg action_id "$action_id" \
+    --argjson context "$action_context" \
+    '{plugin_id: $plugin_id, action_id: $action_id, context: $context}')"
+  response="$(api_request "$target_socket" plugin.action.invoke "$params")"
+  error="$(api_error "$response")"
+  [[ -z "$error" ]] || fail "$target_name: $error"
+}
+
+focus_target() {
+  [[ -n "$target_map" ]] || return 0
+
+  checked_request workspace.focus "$(jq -cn --arg id "$target_workspace_id" '{workspace_id: $id}')"
+  if [[ -n "$target_tab_id" ]]; then
+    checked_request tab.focus "$(jq -cn --arg id "$target_tab_id" '{tab_id: $id}')"
+  fi
+}
+
+checked_request() {
+  local method="$1"
+  local params="$2"
+  local response error
+  response="$(api_request "$target_socket" "$method" "$params")" \
+    || fail "cannot call $target_name $method"
+  error="$(api_error "$response")"
+  [[ -z "$error" ]] || fail "$target_name $method: $error"
+}
+
+snapshot_request() {
+  local response=""
+  local attempt=0
+  while ((attempt < 3)); do
+    if response="$(api_request "$target_socket" session.snapshot '{}')" \
+      && [[ -n "$(jq -c '.result.snapshot // empty' <<<"$response" 2>/dev/null)" ]]; then
+      printf '%s\n' "$response"
+      return
+    fi
+    attempt=$((attempt + 1))
+    ((attempt < 3)) && sleep 0.2
+  done
+
+  if [[ -n "$response" ]]; then
+    printf '%s\n' "$response"
+    return
+  fi
+  fail "cannot reach $target_name Herdr API; mirror may be reconnecting"
+}
+
+api_error() {
+  jq -r '
+    if .error then
+      (.error.message // .error.code // "unknown API error")
+    else
+      empty
+    end
+  ' <<<"$1" 2>/dev/null || printf '%s\n' "invalid API response"
+}
+
+follow_remote_focus() {
+  [[ -n "$target_map" ]] || return 0
+
+  local response active_tab_id local_tab_id
+  local attempt=0
+  while ((attempt < 30)); do
+    sleep 0.2
+    response="$(api_request "$target_socket" session.snapshot '{}')" || return 0
+    active_tab_id="$(jq -r --arg workspace "$target_workspace_id" '
+      .result.snapshot.workspaces[]?
+      | select(.workspace_id == $workspace)
+      | .active_tab_id // empty
+    ' <<<"$response" | head -n1)"
+
+    if [[ -n "$active_tab_id" && "$active_tab_id" != "$initial_active_tab_id" ]]; then
+      local_tab_id="$(jq -r --arg id "$active_tab_id" '.tabs[$id].localId // empty' \
+        "$target_map")"
+      if [[ -n "$local_tab_id" ]]; then
+        HERDR_SOCKET_PATH="$local_socket" command herdr tab focus "$local_tab_id" >/dev/null 2>&1 || true
+        return
+      fi
+    fi
+    attempt=$((attempt + 1))
+  done
+}
+
+api_request() {
+  local socket="$1"
+  local method="$2"
+  local params="$3"
+  local request_id="mirror-plugin-action-$$-$RANDOM"
+  local request
+
+  request="$(jq -cn \
+    --arg id "$request_id" \
+    --arg method "$method" \
+    --argjson params "$params" \
+    '{id: $id, method: $method, params: $params}')"
+  command ruby -rsocket -rjson -rtimeout -e '
+    socket_path, request_id, request = ARGV
+    Timeout.timeout(15) do
+      socket = UNIXSocket.new(socket_path)
+      socket.write(request + "\n")
+      while (line = socket.gets)
+        begin
+          message = JSON.parse(line)
+        rescue JSON::ParserError
+          next
+        end
+        next unless message["id"] == request_id
+        puts JSON.generate(message)
+        exit 0
+      end
+      warn "API closed before response"
+      exit 1
+    end
+  ' "$socket" "$request_id" "$request"
+}
+
+main "$@"

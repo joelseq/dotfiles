@@ -177,8 +177,9 @@ description = "split context-aware pane down"
 
 [[keys.command]]
 key = "prefix+o"
-type = "plugin_action"
-command = "persiyanov.reviewr.toggle" # <plugin_id>.<action_id> — note the id, not the name
+type = "shell"
+command = "$HOME/dotfiles/bin/herdr-mirror-plugin-action persiyanov.reviewr toggle"
+description = "toggle reviewr locally or on mirrored remote"
 
 [[keys.command]]
 key = "prefix+u"
