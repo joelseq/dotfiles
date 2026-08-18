@@ -148,9 +148,9 @@ install_herdr() {
   local install_dir="$HOME/.local/bin"
   local plugins=(
     smarzban/herdr-file-viewer
-    nikok6/herdr-mirror
-    persiyanov/herdr-reviewr
   )
+  [[ -r "$HOME/.config/herdr-mirror/hosts.toml" ]] && plugins+=(nikok6/herdr-mirror)
+  plugins+=(persiyanov/herdr-reviewr)
 
   if [[ -x "$install_dir/herdr" ]]; then
     ok "Herdr already installed at $install_dir/herdr"

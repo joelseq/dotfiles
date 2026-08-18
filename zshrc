@@ -1,3 +1,8 @@
+# Mirror injects an absolute streamer command; skip slow interactive setup.
+if [[ -n "${HERDR_ENV:-}" && "$PWD" == "$HOME/.local/state/herdr-mirror/.mirror-pane" ]]; then
+  return
+fi
+
 # Add deno completions to search path
 if [[ ":$FPATH:" != *":/home/joelseq/.zsh/completions:"* ]]; then export FPATH="/home/joelseq/.zsh/completions:$FPATH"; fi
 # If you come from bash you might have to change your $PATH.

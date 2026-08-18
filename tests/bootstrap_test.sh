@@ -33,8 +33,10 @@ run_tests() {
   test_herdr_installs_directly
   test_existing_direct_herdr_skips_install
   test_herdr_installs_plugins_every_run
+  test_herdr_installs_mirror_only_on_controller
   test_herdr_plugin_failure_continues "$bootstrap"
   test_zshrc_adds_local_bin "$zshrc"
+  test_zshrc_skips_full_init_for_mirror_pane "$zshrc"
   test_zshrc_reports_git_branch "$zshrc"
   test_zshrc_clears_git_branch "$zshrc"
   test_zshrc_skips_branch_token_on_mirror_controller "$zshrc"
@@ -75,15 +77,28 @@ test_existing_direct_herdr_skips_install() {
 
 test_herdr_installs_plugins_every_run() {
   local expected
-  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install nikok6/herdr-mirror --yes\nplugin install persiyanov/herdr-reviewr --yes\nplugin install smarzban/herdr-file-viewer --yes\nplugin install nikok6/herdr-mirror --yes\nplugin install persiyanov/herdr-reviewr --yes'
+  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes\nplugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes'
 
   [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "Herdr plugins not installed every run"
+}
+
+test_herdr_installs_mirror_only_on_controller() {
+  local expected
+  mkdir -p "$HOME/.config/herdr-mirror"
+  touch "$HOME/.config/herdr-mirror/hosts.toml"
+  : >"$BOOTSTRAP_PLUGIN_LOG"
+
+  install_herdr >/dev/null
+
+  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install nikok6/herdr-mirror --yes\nplugin install persiyanov/herdr-reviewr --yes'
+  [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "mirror plugin missing on controller"
+  rm -rf "$HOME/.config/herdr-mirror"
 }
 
 test_herdr_plugin_failure_continues() {
   local bootstrap="$1"
   local expected output status
-  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install nikok6/herdr-mirror --yes\nplugin install persiyanov/herdr-reviewr --yes'
+  expected=$'plugin install smarzban/herdr-file-viewer --yes\nplugin install persiyanov/herdr-reviewr --yes'
   : >"$BOOTSTRAP_PLUGIN_LOG"
   export BOOTSTRAP_FAIL_PLUGIN="smarzban/herdr-file-viewer"
 
@@ -117,6 +132,22 @@ test_zshrc_adds_local_bin() {
   )"
 
   [[ ":$configured_path:" == *":$BOOTSTRAP_TEST_DIR/zsh-home/.local/bin:"* ]] || fail "zshrc does not add ~/.local/bin to PATH"
+}
+
+test_zshrc_skips_full_init_for_mirror_pane() {
+  local zshrc="$1"
+  local mirror_home="$BOOTSTRAP_TEST_DIR/mirror-home"
+  local init_log="$BOOTSTRAP_TEST_DIR/mirror-init.log"
+  local mirror_cwd="$mirror_home/.local/state/herdr-mirror/.mirror-pane"
+  mkdir -p "$mirror_cwd"
+  printf 'print full-init >>%q\n' "$init_log" >"$mirror_home/.zshrc.local"
+
+  HOME="$mirror_home" HERDR_ENV=1 zsh -dfc '
+    cd "$2"
+    source "$1" >/dev/null 2>&1 || true
+  ' zsh "$zshrc" "$mirror_cwd"
+
+  [[ ! -e "$init_log" ]] || fail "mirror pane ran full zsh initialization"
 }
 
 test_zshrc_reports_git_branch() {

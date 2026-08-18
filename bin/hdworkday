@@ -1,0 +1,161 @@
+#!/bin/zsh
+
+typeset -gr HDWORKDAY_PATH="${${(%):-%x}:A}"
+typeset -gr HDWORKDAY_DIR="${HDWORKDAY_PATH:h}"
+
+main() {
+	case "${1:-open}" in
+		open) open_workday ;;
+		open-target) open_target "$2" "$3" ;;
+		connect-target) connect_target "$2" "$3" ;;
+		*) fail "usage: hdworkday [open|open-target <name> <ssh-target>]" ;;
+	esac
+}
+
+open_workday() {
+	local host target
+	local -a hosts=(devbox-1 devbox-2 devbox-3)
+	local -a launch_args=(local local "$(connection_status local local)")
+
+	require_commands herdr osascript ssh || return 1
+	for host in "${hosts[@]}"; do
+		target=$(target_for_host "$host") || {
+			fail "missing $host target in ~/.config/herdr-mirror/hosts.toml"
+			return 1
+		}
+		launch_args+=("$host" "$target" "$(connection_status "$host" "$target")")
+	done
+
+	osascript "$HDWORKDAY_DIR/hdworkday.applescript" \
+		"$HDWORKDAY_PATH" workday "${launch_args[@]}" || return 1
+	start_mirror
+	refresh_mirror
+}
+
+open_target() {
+	local name="$1"
+	local target="$2"
+	local connected
+
+	[[ -n "$name" && -n "$target" ]] || {
+		fail "usage: hdworkday open-target <name> <ssh-target>"
+		return 1
+	}
+	require_commands herdr osascript ssh || return 1
+	connected=$(connection_status "$name" "$target")
+	osascript "$HDWORKDAY_DIR/hdworkday.applescript" \
+		"$HDWORKDAY_PATH" tab "$name" "$target" "$connected"
+}
+
+connect_target() {
+	local name="$1"
+	local target="$2"
+	local herdr_command="${commands[herdr]:-$HOME/.local/bin/herdr}"
+
+	if [[ "$name" == local && "$target" == local ]]; then
+		connect_local
+		return
+	fi
+
+	[[ -n "$name" && -n "$target" ]] || {
+		fail "internal usage: hdworkday connect-target <name> <ssh-target>"
+		return 1
+	}
+	[[ -x "$herdr_command" ]] || {
+		fail "missing command: herdr"
+		return 1
+	}
+	print -n -r -- $'\e]2;hdworkday:'"$name"$'\a'
+	unset HERDR_ENV HERDR_SOCKET_PATH HERDR_CLIENT_SOCKET_PATH HERDR_SESSION
+	unset HERDR_WORKSPACE_ID HERDR_TAB_ID HERDR_PANE_ID HERDR_STARTUP_CWD
+	"$herdr_command" --remote-keybindings server --remote "$target"
+}
+
+connect_local() {
+	local herdr_command="${commands[herdr]:-$HOME/.local/bin/herdr}"
+
+	[[ -x "$herdr_command" ]] || {
+		fail "missing command: herdr"
+		return 1
+	}
+	print -n -r -- $'\e]2;hdworkday:local\a'
+	unset HERDR_ENV HERDR_SOCKET_PATH HERDR_CLIENT_SOCKET_PATH HERDR_SESSION
+	unset HERDR_WORKSPACE_ID HERDR_TAB_ID HERDR_PANE_ID HERDR_STARTUP_CWD
+	"$herdr_command"
+}
+
+connection_status() {
+	local name="$1"
+	local target="$2"
+
+	if connection_alive "$name" "$target"; then
+		print true
+	else
+		print false
+	fi
+}
+
+connection_alive() {
+	local name="$1"
+	local target="$2"
+	local expected="/bin/zsh $HDWORKDAY_PATH connect-target $name $target"
+	local command_line
+	local pid
+
+	for pid in ${(f)"$(pgrep -f "$HDWORKDAY_PATH connect-target" 2>/dev/null)"}; do
+		command_line=$(ps -ww -p "$pid" -o command= 2>/dev/null) || continue
+		[[ "$command_line" == "$expected" ]] && return 0
+	done
+	return 1
+}
+
+start_mirror() {
+	local action_error
+
+	action_error=$(herdr plugin action invoke mirror.start 2>&1) ||
+		print -u2 -- "warning: mirror daemon did not start: $action_error"
+}
+
+refresh_mirror() {
+	local action_error
+
+	if action_error=$(herdr plugin action invoke mirror.once 2>&1); then
+		print -- "mirror refreshed"
+	else
+		print -u2 -- "warning: mirror refresh failed: $action_error"
+	fi
+}
+
+target_for_host() {
+	local host="$1"
+	local config="${HERDR_MIRROR_CONFIG:-$HOME/.config/herdr-mirror/hosts.toml}"
+
+	[[ -r "$config" ]] || return 1
+	awk -v section="[hosts.$host]" '
+		$0 == section { active = 1; next }
+		active && /^\[/ { exit }
+		active && /^[[:space:]]*target[[:space:]]*=/ {
+			sub(/^[^=]*=[[:space:]]*"/, "")
+			sub(/"[[:space:]]*(#.*)?$/, "")
+			print
+			exit
+		}
+	' "$config" | grep .
+}
+
+require_commands() {
+	local command_name
+	for command_name in "$@"; do
+		command -v "$command_name" >/dev/null || {
+			fail "missing command: $command_name"
+			return 1
+		}
+	done
+}
+
+fail() {
+	print -u2 -r -- "hdworkday: $1"
+	return 1
+}
+
+main "$@"
