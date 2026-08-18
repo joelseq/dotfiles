@@ -18,6 +18,8 @@ target = "target-1"
 target = "target-2"
 [hosts.devbox-3]
 target = "target-3"
+[hosts.extra]
+target = "target-extra"
 CONFIG
   HDWORKDAY_EVENT_LOG="$HDWORKDAY_TEST_DIR/events.log"
   export HDWORKDAY_EVENT_LOG
@@ -27,6 +29,9 @@ CONFIG
 
   test_open_workday_opens_local_first_then_starts_mirror
   test_local_target_opens_local_herdr
+  test_stop_stops_named_remote
+  test_stop_all_stops_every_configured_remote
+  test_stop_all_continues_after_failure
   printf 'hdworkday tests passed\n'
 }
 
@@ -42,6 +47,7 @@ STUB
   cat >"$HDWORKDAY_TEST_DIR/bin/ssh" <<'STUB'
 #!/bin/sh
 printf 'ssh %s\n' "$*" >>"$HDWORKDAY_EVENT_LOG"
+[[ "$1" != "${HDWORKDAY_FAIL_SSH_TARGET:-}" ]] || exit 1
 exit 0
 STUB
   cat >"$HDWORKDAY_TEST_DIR/bin/pgrep" <<'STUB'
@@ -67,6 +73,36 @@ test_local_target_opens_local_herdr() {
   zsh "$hdworkday" connect-target local local >/dev/null
 
   [[ "$(cat "$HDWORKDAY_EVENT_LOG")" == "herdr " ]] || fail "local tab did not open local Herdr"
+}
+
+test_stop_stops_named_remote() {
+  : >"$HDWORKDAY_EVENT_LOG"
+
+  zsh "$hdworkday" stop devbox-2 >/dev/null
+
+  [[ "$(cat "$HDWORKDAY_EVENT_LOG")" == 'ssh target-2 $HOME/.local/bin/herdr server stop' ]] || fail "named remote not stopped"
+}
+
+test_stop_all_stops_every_configured_remote() {
+  local expected
+  : >"$HDWORKDAY_EVENT_LOG"
+
+  zsh "$hdworkday" stop-all >/dev/null
+
+  expected=$'ssh target-1 $HOME/.local/bin/herdr server stop\nssh target-2 $HOME/.local/bin/herdr server stop\nssh target-3 $HOME/.local/bin/herdr server stop\nssh target-extra $HOME/.local/bin/herdr server stop'
+  [[ "$(cat "$HDWORKDAY_EVENT_LOG")" == "$expected" ]] || fail "not all remotes stopped"
+}
+
+test_stop_all_continues_after_failure() {
+  local expected
+  : >"$HDWORKDAY_EVENT_LOG"
+
+  if HDWORKDAY_FAIL_SSH_TARGET=target-2 zsh "$hdworkday" stop-all >/dev/null; then
+    fail "stop-all succeeded after remote failure"
+  fi
+
+  expected=$'ssh target-1 $HOME/.local/bin/herdr server stop\nssh target-2 $HOME/.local/bin/herdr server stop\nssh target-3 $HOME/.local/bin/herdr server stop\nssh target-extra $HOME/.local/bin/herdr server stop'
+  [[ "$(cat "$HDWORKDAY_EVENT_LOG")" == "$expected" ]] || fail "stop-all stopped after remote failure"
 }
 
 fail() {

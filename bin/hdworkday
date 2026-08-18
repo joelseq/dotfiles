@@ -8,7 +8,9 @@ main() {
 		open) open_workday ;;
 		open-target) open_target "$2" "$3" ;;
 		connect-target) connect_target "$2" "$3" ;;
-		*) fail "usage: hdworkday [open|open-target <name> <ssh-target>]" ;;
+		stop) stop_remote "$2" ;;
+		stop-all) stop_all_remotes ;;
+		*) fail "usage: hdworkday [open|open-target <name> <ssh-target>|stop <name>|stop-all]" ;;
 	esac
 }
 
@@ -84,6 +86,38 @@ connect_local() {
 	"$herdr_command"
 }
 
+stop_remote() {
+	local name="$1"
+	local target
+
+	[[ -n "$name" ]] || {
+		fail "usage: hdworkday stop <name>"
+		return 1
+	}
+	require_commands ssh || return 1
+	target=$(target_for_host "$name") || {
+		fail "missing $name target in ~/.config/herdr-mirror/hosts.toml"
+		return 1
+	}
+	ssh "$target" '$HOME/.local/bin/herdr server stop'
+}
+
+stop_all_remotes() {
+	local name
+	local failed=0
+	local -a names
+
+	names=("${(@f)$(remote_names)}")
+	(( ${#names} )) || {
+		fail "no remotes in ~/.config/herdr-mirror/hosts.toml"
+		return 1
+	}
+	for name in "${names[@]}"; do
+		stop_remote "$name" || failed=1
+	done
+	return "$failed"
+}
+
 connection_status() {
 	local name="$1"
 	local target="$2"
@@ -141,6 +175,20 @@ target_for_host() {
 			exit
 		}
 	' "$config" | grep .
+}
+
+remote_names() {
+	local config="${HERDR_MIRROR_CONFIG:-$HOME/.config/herdr-mirror/hosts.toml}"
+
+	[[ -r "$config" ]] || return 1
+	awk '
+		/^[[:space:]]*\[hosts\.[^]]+\][[:space:]]*$/ {
+			name = $0
+			sub(/^[[:space:]]*\[hosts\./, "", name)
+			sub(/\][[:space:]]*$/, "", name)
+			print name
+		}
+	' "$config"
 }
 
 require_commands() {
