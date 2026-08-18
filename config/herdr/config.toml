@@ -153,26 +153,26 @@ description = "open file viewer in tab"
 
 [[keys.command]]
 key = "prefix+c"
-type = "plugin_action"
-command = "mirror.remote-new-tab"
+type = "shell"
+command = "$HOME/dotfiles/bin/herdr-layout-action tab"
 description = "create context-aware tab"
 
 [[keys.command]]
 key = "prefix+alt+n"
-type = "plugin_action"
-command = "mirror.remote-new-workspace"
+type = "shell"
+command = "$HOME/dotfiles/bin/herdr-layout-action workspace"
 description = "create remote workspace"
 
 [[keys.command]]
 key = "prefix+v"
-type = "plugin_action"
-command = "mirror.remote-split-right"
+type = "shell"
+command = "$HOME/dotfiles/bin/herdr-layout-action split-right"
 description = "split context-aware pane right"
 
 [[keys.command]]
 key = "prefix+minus"
-type = "plugin_action"
-command = "mirror.remote-split-down"
+type = "shell"
+command = "$HOME/dotfiles/bin/herdr-layout-action split-down"
 description = "split context-aware pane down"
 
 [[keys.command]]

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+main() {
+  if [[ -r "$HOME/.config/herdr-mirror/hosts.toml" ]]; then
+    [[ -x "$HOME/.local/bin/herdr-mirror" ]] || fail "missing command: herdr-mirror"
+    run_mirror_action "${1:-}"
+    return
+  fi
+
+  case "${1:-}" in
+    tab)
+      command herdr tab create \
+        --workspace "${HERDR_ACTIVE_WORKSPACE_ID:?}" \
+        --cwd "${HERDR_ACTIVE_PANE_CWD:?}" \
+        --focus
+      ;;
+    workspace)
+      command herdr workspace create \
+        --cwd "${HERDR_ACTIVE_PANE_CWD:?}" \
+        --focus
+      ;;
+    split-right | split-down)
+      command herdr pane split \
+        --pane "${HERDR_ACTIVE_PANE_ID:?}" \
+        --direction "${1#split-}" \
+        --cwd "${HERDR_ACTIVE_PANE_CWD:?}" \
+        --focus
+      ;;
+    *) fail "usage: herdr-layout-action <tab|workspace|split-right|split-down>" ;;
+  esac
+}
+
+run_mirror_action() {
+  case "$1" in
+    tab) "$HOME/.local/bin/herdr-mirror" remote-tab ;;
+    workspace) "$HOME/.local/bin/herdr-mirror" remote-workspace ;;
+    split-right) "$HOME/.local/bin/herdr-mirror" remote-split right ;;
+    split-down) "$HOME/.local/bin/herdr-mirror" remote-split down ;;
+    *) fail "usage: herdr-layout-action <tab|workspace|split-right|split-down>" ;;
+  esac
+}
+
+fail() {
+  printf 'herdr-layout-action: %s\n' "$1" >&2
+  exit 1
+}
+
+main "$@"
