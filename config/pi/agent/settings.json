@@ -13,6 +13,7 @@
     "npm:pi-subagents",
     "npm:pi-lens",
     "npm:@juicesharp/rpiv-ask-user-question",
-    "npm:@juicesharp/rpiv-todo"
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@andrewjacop/pi-herdr"
   ]
 }
