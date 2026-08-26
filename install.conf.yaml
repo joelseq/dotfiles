@@ -26,9 +26,6 @@
     ~/.config/ghostty:
       create: true
       path: config/ghostty
-    ~/.config/herdr/config.toml:
-      create: true
-      path: config/herdr/config.toml
     ~/.config/herdr/plugins/config/persiyanov.reviewr/config.toml:
       create: true
       path: config/herdr/plugins/config/persiyanov.reviewr/config.toml
@@ -64,6 +61,18 @@
     ~/.pi/agent/skills:
       create: true
       path: config/pi/agent/skills
+
+- link:
+    ~/.config/herdr/config.toml:
+      create: true
+      path: config/herdr/config.toml
+      if: '[ "$(uname -s)" = Darwin ]'
+
+- link:
+    ~/.config/herdr/config.toml:
+      create: true
+      path: config/herdr/config.devbox.toml
+      if: '[ "$(uname -s)" = Linux ]'
 
 - shell:
     - [git submodule update --init --recursive, Installing submodules]

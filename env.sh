@@ -117,7 +117,9 @@ function hdw() {
 	fi
 
 	# If called outside Herdr, attach/open the Herdr client after preparing the workspace.
-	[[ -z "$HERDR_ENV" ]] && herdr
+	if [[ -z "$HERDR_ENV" ]]; then
+		herdr
+	fi
 }
 
 # fbr - checkout git branch (including remote branches)

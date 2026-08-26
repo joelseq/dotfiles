@@ -1,4 +1,4 @@
-# herdr configuration
+# herdr devbox configuration
 # Tracked in dotfiles and symlinked to ~/.config/herdr/config.toml by Dotbot.
 # Reload after changes with: herdr server reload-config
 
@@ -44,7 +44,7 @@ open_notification_target = "prefix+shift+o"
 # Workspaces are the closest analogue to tmux sessions.
 workspace_picker = ["prefix+w", "prefix+ctrl+f"]
 goto = "prefix+g"
-new_workspace = ["prefix+shift+n", "prefix+ctrl+c"]
+new_workspace = ["prefix+shift+n", "prefix+ctrl+c", "prefix+alt+n"]
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
 previous_workspace = "prefix+shift+left"
@@ -62,7 +62,7 @@ next_agent = "prefix+alt+down"
 focus_agent = "prefix+alt+1..9"
 
 # Tabs are the closest analogue to tmux windows.
-new_tab = "prefix+shift+c"
+new_tab = ["prefix+shift+c", "prefix+c"]
 rename_tab = "prefix+shift+t"
 previous_tab = ["prefix+p", "prefix+ctrl+h"]
 next_tab = ["prefix+n", "prefix+ctrl+l"]
@@ -87,8 +87,8 @@ swap_pane_right = "prefix+shift+l"
 cycle_pane_next = "prefix+tab"
 cycle_pane_previous = "prefix+shift+tab"
 last_pane = "prefix+semicolon"
-split_horizontal = "prefix+shift+minus"
-split_vertical = "prefix+shift+v"
+split_horizontal = ["prefix+shift+minus", "prefix+minus"]
+split_vertical = ["prefix+shift+v", "prefix+v"]
 close_pane = "prefix+x"
 zoom = ["prefix+z", "prefix+plus"] # tmux: prefix++ maximize pane
 toggle_sidebar = "prefix+b"
@@ -152,34 +152,10 @@ command = "herdr-file-viewer.open-file-viewer-tab"
 description = "open file viewer in tab"
 
 [[keys.command]]
-key = "prefix+c"
-type = "plugin_action"
-command = "mirror.remote-new-tab"
-description = "create context-aware tab"
-
-[[keys.command]]
-key = "prefix+alt+n"
-type = "plugin_action"
-command = "mirror.remote-new-workspace"
-description = "create remote workspace"
-
-[[keys.command]]
-key = "prefix+v"
-type = "plugin_action"
-command = "mirror.remote-split-right"
-description = "split context-aware pane right"
-
-[[keys.command]]
-key = "prefix+minus"
-type = "plugin_action"
-command = "mirror.remote-split-down"
-description = "split context-aware pane down"
-
-[[keys.command]]
 key = "prefix+o"
-type = "shell"
-command = "$HOME/.local/bin/herdr-mirror remote-invoke persiyanov.reviewr.toggle"
-description = "toggle reviewr locally or on mirrored remote"
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+description = "toggle reviewr"
 
 [[keys.command]]
 key = "prefix+u"
@@ -188,3 +164,4 @@ command = "lazygit"
 description = "open lazygit popup"
 width = "90%"
 height = "90%"
+
