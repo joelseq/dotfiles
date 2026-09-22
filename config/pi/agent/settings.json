@@ -14,6 +14,11 @@
     "npm:pi-lens",
     "npm:@juicesharp/rpiv-ask-user-question",
     "npm:@juicesharp/rpiv-todo",
-    "npm:@andrewjacop/pi-herdr"
+    "npm:@andrewjacop/pi-herdr",
+    "npm:pi-sessions",
+    "npm:@ff-labs/pi-fff",
+    "npm:pi-context-view",
+    "npm:pi-cache-graph",
+    "npm:pi-navigator"
   ]
 }
