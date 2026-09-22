@@ -170,6 +170,17 @@ install_herdr() {
   info "Herdr plugin installation finished"
 }
 
+install_herdr_pi_integration() {
+  local herdr="$HOME/.local/bin/herdr"
+
+  info "Installing Herdr Pi integration..."
+  if ! "$herdr" integration install pi; then
+    error "Failed to install Herdr Pi integration"
+    return 1
+  fi
+  ok "Herdr Pi integration installed"
+}
+
 # ---------------------------------------------------------------------------
 # 5. Install oh-my-zsh
 # ---------------------------------------------------------------------------
@@ -457,6 +468,7 @@ main() {
   install_herdr
   install_oh_my_zsh
   install_nvm
+  install_herdr_pi_integration
   bridge_mise_rbenv
   set_default_shell
   backup_existing_dotfiles

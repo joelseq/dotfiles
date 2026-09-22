@@ -22,6 +22,10 @@ run_tests() {
     'if [[ "${BOOTSTRAP_FAIL_PLUGIN:-}" == "$3" ]]; then' \
     '  echo "plugin install failed" >&2' \
     '  exit 1' \
+    'fi' \
+    'if [[ "$1" == "integration" && "$2" == "install" && "${BOOTSTRAP_FAIL_INTEGRATION:-}" == "$3" ]]; then' \
+    '  echo "integration install failed" >&2' \
+    '  exit 1' \
     'fi' >"$BOOTSTRAP_HERDR_STUB"
   chmod +x "$BOOTSTRAP_HERDR_STUB"
 
@@ -35,12 +39,14 @@ run_tests() {
   test_herdr_installs_plugins_every_run
   test_herdr_installs_mirror_only_on_controller
   test_herdr_plugin_failure_continues "$bootstrap"
+  test_herdr_installs_pi_integration_every_run
+  test_herdr_pi_integration_failure_stops
   test_zshrc_adds_local_bin "$zshrc"
   test_zshrc_skips_full_init_for_mirror_pane "$zshrc"
   test_zshrc_reports_git_branch "$zshrc"
   test_zshrc_clears_git_branch "$zshrc"
   test_zshrc_skips_branch_token_on_mirror_controller "$zshrc"
-  test_main_installs_herdr_after_brew
+  test_main_installs_pi_after_node
   printf 'bootstrap tests passed\n'
 }
 
@@ -119,6 +125,30 @@ SCRIPT
   [[ "$output" == *"continued"* ]] || fail "bootstrap did not continue after plugin failure"
   [[ "$output" == *"Failed to install Herdr plugin smarzban/herdr-file-viewer; continuing"* ]] || fail "plugin failure error missing"
   [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "later plugin skipped after failure"
+}
+
+test_herdr_installs_pi_integration_every_run() {
+  local expected
+  expected=$'integration install pi\nintegration install pi'
+  : >"$BOOTSTRAP_PLUGIN_LOG"
+
+  install_herdr_pi_integration >/dev/null
+  install_herdr_pi_integration >/dev/null
+
+  [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "Pi integration not installed every run"
+}
+
+test_herdr_pi_integration_failure_stops() {
+  local status
+  export BOOTSTRAP_FAIL_INTEGRATION="pi"
+
+  set +e
+  install_herdr_pi_integration >/dev/null 2>&1
+  status=$?
+  set -e
+  unset BOOTSTRAP_FAIL_INTEGRATION
+
+  [[ "$status" -ne 0 ]] || fail "Pi integration failure did not stop bootstrap"
 }
 
 test_zshrc_adds_local_bin() {
@@ -214,7 +244,7 @@ test_zshrc_skips_branch_token_on_mirror_controller() {
   [[ ! -s "$metadata_log" ]] || fail "mirror controller reported duplicate branch token"
 }
 
-test_main_installs_herdr_after_brew() {
+test_main_installs_pi_after_node() {
   BOOTSTRAP_MAIN_LOG="$BOOTSTRAP_TEST_DIR/main.log"
   export BOOTSTRAP_MAIN_LOG
   : >"$BOOTSTRAP_MAIN_LOG"
@@ -222,7 +252,7 @@ test_main_installs_herdr_after_brew() {
   stub_main_dependencies
   main >/dev/null
 
-  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr' ]] || fail "main does not install Herdr after Brew packages"
+  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr\nnode\npi' ]] || fail "main installation order is wrong"
 }
 
 stub_main_dependencies() {
@@ -232,7 +262,8 @@ stub_main_dependencies() {
   install_brew_packages() { printf 'brew\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   install_herdr() { printf 'herdr\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   install_oh_my_zsh() { :; }
-  install_nvm() { :; }
+  install_nvm() { printf 'node\n' >>"$BOOTSTRAP_MAIN_LOG"; }
+  install_herdr_pi_integration() { printf 'pi\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   bridge_mise_rbenv() { :; }
   set_default_shell() { :; }
   backup_existing_dotfiles() { :; }
