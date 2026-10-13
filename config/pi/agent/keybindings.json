@@ -1,0 +1,9 @@
+{
+  "$schema": "https://pi.dev/schemas/keybindings.schema.json",
+  "tui.altScreen.lineUp": "alt+k",
+  "tui.altScreen.lineDown": "alt+j",
+  "tui.altScreen.halfPageUp": "alt+shift+k",
+  "tui.altScreen.halfPageDown": "alt+shift+j",
+  "tui.altScreen.top": "alt+shift+h",
+  "tui.altScreen.bottom": "alt+shift+l"
+}

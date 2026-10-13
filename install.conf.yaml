@@ -49,6 +49,9 @@
     ~/.pi/agent/settings.json:
       create: true
       path: config/pi/agent/settings.json
+    ~/.pi/agent/keybindings.json:
+      create: true
+      path: config/pi/agent/keybindings.json
     ~/.pi-lens/config.json:
       create: true
       path: config/pi-lens/config.json
