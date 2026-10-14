@@ -19,6 +19,10 @@ run_tests() {
   printf '%s\n' \
     '#!/usr/bin/env bash' \
     'echo "$*" >>"$BOOTSTRAP_PLUGIN_LOG"' \
+    'if [[ "$1" == "integration" && ! -d "$HOME/.pi/agent/extensions" ]]; then' \
+    '  echo "pi extension directory not found" >&2' \
+    '  exit 1' \
+    'fi' \
     'if [[ "${BOOTSTRAP_FAIL_PLUGIN:-}" == "$3" ]]; then' \
     '  echo "plugin install failed" >&2' \
     '  exit 1' \
@@ -39,6 +43,11 @@ run_tests() {
   test_herdr_installs_plugins_every_run
   test_herdr_installs_mirror_only_on_controller
   test_herdr_plugin_failure_continues "$bootstrap"
+  test_pi_install missing
+  test_pi_install existing
+  test_pi_install failed
+  test_pi_install unavailable
+  test_herdr_pi_integration_missing_directory
   test_herdr_installs_pi_integration_every_run
   test_herdr_pi_integration_failure_stops
   test_zshrc_adds_local_bin "$zshrc"
@@ -46,7 +55,7 @@ run_tests() {
   test_zshrc_reports_git_branch "$zshrc"
   test_zshrc_clears_git_branch "$zshrc"
   test_zshrc_skips_branch_token_on_mirror_controller "$zshrc"
-  test_main_installs_pi_after_node
+  test_main_installs_pi_after_node_and_integration_after_dotbot
   printf 'bootstrap tests passed\n'
 }
 
@@ -127,10 +136,69 @@ SCRIPT
   [[ "$(cat "$BOOTSTRAP_PLUGIN_LOG")" == "$expected" ]] || fail "later plugin skipped after failure"
 }
 
+test_pi_install() (
+  local scenario="$1"
+  local pi_available=0 npm_called=0 status=0
+
+  if [[ "$scenario" == "existing" ]]; then
+    pi_available=1
+  fi
+
+  # Called by install_pi from the sourced bootstrap script.
+  # shellcheck disable=SC2329
+  command() {
+    if [[ "$*" == "-v pi" ]]; then
+      [[ "$pi_available" -eq 1 ]]
+    else
+      builtin command "$@"
+    fi
+  }
+
+  # shellcheck disable=SC2329
+  npm() {
+    npm_called=1
+    [[ "$*" == "install -g --ignore-scripts @earendil-works/pi-coding-agent" ]] || fail "wrong Pi package"
+
+    if [[ "$scenario" == "failed" ]]; then
+      return 1
+    fi
+
+    if [[ "$scenario" != "unavailable" ]]; then
+      pi_available=1
+    fi
+  }
+
+  install_pi >/dev/null 2>&1 || status=$?
+
+  case "$scenario" in
+    missing)
+      [[ "$status" -eq 0 && "$npm_called" -eq 1 && "$pi_available" -eq 1 ]] || fail "Pi not installed"
+      ;;
+    existing)
+      [[ "$status" -eq 0 && "$npm_called" -eq 0 ]] || fail "existing Pi installed again"
+      ;;
+    failed|unavailable)
+      [[ "$status" -ne 0 && "$npm_called" -eq 1 ]] || fail "Pi installation failure ignored"
+      ;;
+  esac
+)
+
+test_herdr_pi_integration_missing_directory() {
+  local status=0
+  : >"$BOOTSTRAP_PLUGIN_LOG"
+
+  install_herdr_pi_integration >/dev/null 2>&1 || status=$?
+
+  [[ "$status" -ne 0 ]] || fail "missing Pi directory ignored"
+  [[ ! -s "$BOOTSTRAP_PLUGIN_LOG" ]] || fail "Herdr called without Pi directory"
+}
+
 test_herdr_installs_pi_integration_every_run() {
   local expected
   expected=$'integration install pi\nintegration install pi'
   : >"$BOOTSTRAP_PLUGIN_LOG"
+  mkdir -p "$HOME/.pi/agent" "$BOOTSTRAP_TEST_DIR/extensions"
+  ln -s "$BOOTSTRAP_TEST_DIR/extensions" "$HOME/.pi/agent/extensions"
 
   install_herdr_pi_integration >/dev/null
   install_herdr_pi_integration >/dev/null
@@ -244,7 +312,7 @@ test_zshrc_skips_branch_token_on_mirror_controller() {
   [[ ! -s "$metadata_log" ]] || fail "mirror controller reported duplicate branch token"
 }
 
-test_main_installs_pi_after_node() {
+test_main_installs_pi_after_node_and_integration_after_dotbot() {
   BOOTSTRAP_MAIN_LOG="$BOOTSTRAP_TEST_DIR/main.log"
   export BOOTSTRAP_MAIN_LOG
   : >"$BOOTSTRAP_MAIN_LOG"
@@ -252,7 +320,7 @@ test_main_installs_pi_after_node() {
   stub_main_dependencies
   main >/dev/null
 
-  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr\nnode\npi' ]] || fail "main installation order is wrong"
+  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr\nnode\npi\ndotbot\nintegration' ]] || fail "main installation order is wrong"
 }
 
 stub_main_dependencies() {
@@ -263,11 +331,12 @@ stub_main_dependencies() {
   install_herdr() { printf 'herdr\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   install_oh_my_zsh() { :; }
   install_nvm() { printf 'node\n' >>"$BOOTSTRAP_MAIN_LOG"; }
-  install_herdr_pi_integration() { printf 'pi\n' >>"$BOOTSTRAP_MAIN_LOG"; }
+  install_pi() { printf 'pi\n' >>"$BOOTSTRAP_MAIN_LOG"; }
+  install_herdr_pi_integration() { printf 'integration\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   bridge_mise_rbenv() { :; }
   set_default_shell() { :; }
   backup_existing_dotfiles() { :; }
-  run_dotbot() { :; }
+  run_dotbot() { printf 'dotbot\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   install_nvim_plugins() { :; }
   install_work_state() { :; }
   install_work_config() { :; }

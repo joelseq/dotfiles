@@ -173,6 +173,11 @@ install_herdr() {
 install_herdr_pi_integration() {
   local herdr="$HOME/.local/bin/herdr"
 
+  if [[ ! -d "$HOME/.pi/agent/extensions" ]]; then
+    error "Pi extension directory missing; check Dotbot symlink setup"
+    return 1
+  fi
+
   info "Installing Herdr Pi integration..."
   if ! "$herdr" integration install pi; then
     error "Failed to install Herdr Pi integration"
@@ -232,6 +237,27 @@ install_nvm() {
     npm install -g @typescript/native-preview
     ok "tsgo installed"
   fi
+}
+
+# Install Pi after Node.js is available.
+install_pi() {
+  if command -v pi &>/dev/null; then
+    ok "Pi already installed"
+    return 0
+  fi
+
+  info "Installing Pi (@earendil-works/pi-coding-agent)..."
+  if ! npm install -g --ignore-scripts @earendil-works/pi-coding-agent; then
+    error "Failed to install Pi"
+    return 1
+  fi
+
+  if ! command -v pi &>/dev/null; then
+    error "Pi not found on PATH after installation"
+    return 1
+  fi
+
+  ok "Pi installed"
 }
 
 # ---------------------------------------------------------------------------
@@ -468,11 +494,12 @@ main() {
   install_herdr
   install_oh_my_zsh
   install_nvm
-  install_herdr_pi_integration
+  install_pi
   bridge_mise_rbenv
   set_default_shell
   backup_existing_dotfiles
   run_dotbot
+  install_herdr_pi_integration
   install_nvim_plugins
   install_work_state
   install_work_config
