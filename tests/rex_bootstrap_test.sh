@@ -132,7 +132,7 @@ INSTALLER
         ;;
       server)
         printf '%s\n' "$*" >>"$REX_TEST_LOG"
-        [[ "$*" == 'server start --tailscale --tailscale-hostname rex-devbox-2 '* ]] || fail 'Wrong server flags'
+        [[ "$*" == 'server start --tailscale --tailscale-hostname jsequeira-devbox-2 '* ]] || fail 'Wrong server flags'
         [[ "$*" != *'--allow-anonymous'* && "$*" != *'--extra-listen'* ]] || fail 'Native setup opened an anonymous listener'
         [[ "$ALL_PROXY" == 'socks5://127.0.0.1:17296' && "$*" == *'--env ALL_PROXY'* ]] || fail 'Native proxy was not configured'
         [[ "$*" == *'--env ANTHROPIC_API_KEY'* && "$*" == *'--env GIT_ASKPASS'* && "$*" == *'--env CODER_WORKSPACE_NAME'* && "$*" == *'--env CUSTOM_CODER_SETTING'* ]] || fail 'Coder environment was not forwarded'

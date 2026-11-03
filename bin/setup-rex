@@ -60,7 +60,7 @@ start_rex_server() {
   done < <(rex_environment_names)
 
   proxy_url="$(start_rex_proxy)" || return 1
-  node_name="rex-${CODER_WORKSPACE_NAME:-$(hostname -s)}"
+  node_name="jsequeira-${CODER_WORKSPACE_NAME:-$(hostname -s)}"
 
   # The loopback proxy avoids interface-bound outbound sockets in these Coder
   # containers. Rex still joins Tailscale itself and serves authenticated HTTPS.
