@@ -11,6 +11,10 @@ main() {
     return 1
   fi
 
+  if ! install_rex_proxy; then
+    return 1
+  fi
+
   start_rex_server
 }
 
@@ -48,31 +52,119 @@ install_rex() {
 }
 
 start_rex_server() {
-  local status tunnel_status instance_id tunnel_instance_id
+  local status variable proxy_url node_name
+  local environment_args=()
 
-  # Coder forwards this loopback listener through its authenticated connection.
-  # Starting again preserves an existing server and every session on it.
-  if ! status="$(rex server start --extra-listen http://127.0.0.1:7297 --allow-anonymous --json)"; then
+  while IFS= read -r variable; do
+    environment_args+=(--env "$variable")
+  done < <(rex_environment_names)
+
+  proxy_url="$(start_rex_proxy)" || return 1
+  node_name="rex-${CODER_WORKSPACE_NAME:-$(hostname -s)}"
+
+  # The loopback proxy avoids interface-bound outbound sockets in these Coder
+  # containers. Rex still joins Tailscale itself and serves authenticated HTTPS.
+  if ! status="$(ALL_PROXY="$proxy_url" rex server start --tailscale --tailscale-hostname "$node_name" "${environment_args[@]}" --env ALL_PROXY --json)"; then
     printf 'Cannot start the Rex server.\n' >&2
     return 1
   fi
 
-  if ! tunnel_status="$(rex -S http://127.0.0.1:7297 --autostart=false server status --json 2>/dev/null)"; then
-    printf 'Rex is not reachable on loopback port 7297. Existing sessions were preserved.\n' >&2
-    printf 'An older server needs its listener changed before a tunnel can connect.\n' >&2
-    return 1
-  fi
-
-  instance_id="$(printf '%s\n' "$status" | sed -n 's/.*"instance_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
-  tunnel_instance_id="$(printf '%s\n' "$tunnel_status" | sed -n 's/.*"instance_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
-
-  if [[ -z "$instance_id" || "$tunnel_instance_id" != "$instance_id" ]]; then
-    printf 'Loopback port 7297 belongs to another server. Existing sessions were preserved.\n' >&2
-    return 1
-  fi
-
   printf '%s\n' "$status"
-  printf 'Rex is ready for a Coder tunnel on loopback port 7297.\n'
+
+  if ! python3 -c '
+import json,os,pathlib,sys
+status=json.loads(sys.argv[1])
+environment={item.split(b"=",1)[0].decode() for item in pathlib.Path("/proc/{}/environ".format(status["pid"])).read_bytes().split(b"\0") if b"=" in item}
+expected=[key for key in ["CODER_AGENT_TOKEN","CODER_AGENT_URL","GIT_ASKPASS","ANTHROPIC_API_KEY","OPENAI_API_KEY"] if os.environ.get(key)]
+missing=[key for key in expected if key not in environment]
+if missing:
+    print("Existing Rex server lacks Coder variables: "+", ".join(missing),file=sys.stderr)
+    print("Restart Rex when its sessions can close. Existing sessions were preserved.",file=sys.stderr)
+    sys.exit(1)
+if status.get("tailscale",{}).get("state")=="disabled":
+    print("Existing Rex server has Tailscale disabled. Restart it when its sessions can close.",file=sys.stderr)
+    sys.exit(1)
+' "$status"; then
+    return 1
+  fi
+
+  rex api call server.tailscale.login '{}'
+  printf 'Open auth_url from rex server status in your Mac browser, then use tailscale.https.url in Rex.\n'
+}
+
+install_rex_proxy() {
+  if command -v microsocks >/dev/null 2>&1; then
+    return 0
+  fi
+
+  if ! command -v apt-get >/dev/null 2>&1; then
+    printf 'Install microsocks for the native Tailscale compatibility proxy, then run setup again.\n' >&2
+    return 1
+  fi
+
+  if ! sudo apt-get install -y microsocks; then
+    printf 'Cannot install the native Tailscale compatibility proxy.\n' >&2
+    return 1
+  fi
+}
+
+start_rex_proxy() {
+  local directory proxy_pid
+  directory="${XDG_STATE_HOME:-$HOME/.local/state}/rex/native-proxy"
+  mkdir -p "$directory"
+  chmod 700 "$directory"
+
+  if [[ -r "$directory/pid" ]]; then
+    proxy_pid="$(cat "$directory/pid")"
+
+    if [[ "$proxy_pid" =~ ^[0-9]+$ ]] && kill -0 "$proxy_pid" 2>/dev/null; then
+      if ! python3 -c '
+import pathlib,sys
+arguments=pathlib.Path("/proc/{}/cmdline".format(sys.argv[1])).read_bytes().split(b"\0")
+assert pathlib.Path(arguments[0].decode()).name=="microsocks"
+assert arguments[1:5]==[b"-i",b"127.0.0.1",b"-p",b"17296"]
+' "$proxy_pid"; then
+        printf 'Proxy PID belongs to another process; preserved.\n' >&2
+        return 1
+      fi
+
+      printf 'socks5://127.0.0.1:17296\n'
+      return 0
+    fi
+  fi
+
+  (umask 077; touch "$directory/proxy.log")
+  nohup env -i PATH=/usr/bin:/bin microsocks -i 127.0.0.1 -p 17296 >>"$directory/proxy.log" 2>&1 </dev/null &
+  proxy_pid=$!
+  printf '%s\n' "$proxy_pid" >"$directory/pid"
+  sleep 0.2
+
+  if ! kill -0 "$proxy_pid" 2>/dev/null; then
+    printf 'Cannot start the native Tailscale compatibility proxy; check %s/proxy.log.\n' "$directory" >&2
+    return 1
+  fi
+
+  printf 'socks5://127.0.0.1:17296\n'
+}
+
+rex_environment_names() {
+  local variable
+
+  # Forward the Coder shell environment by name. Values stay out of arguments
+  # and configuration files. Do not retain the launching terminal's session state.
+  while IFS= read -r variable; do
+    if [[ ! "$variable" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]]; then
+      continue
+    fi
+
+    case "$variable" in
+      ALL_PROXY|BASH*|REX_*|TMUX*|HERDR*|SSH_CLIENT|SSH_CONNECTION|SSH_TTY|SSH_AUTH_SOCK|PWD|OLDPWD|SHLVL|_|TERM|TERM_PROGRAM|TERM_PROGRAM_VERSION|COLORTERM|COLUMNS|LINES|XDG_SESSION_ID|XDG_SESSION_TYPE)
+        continue
+        ;;
+    esac
+
+    printf '%s\n' "$variable"
+  done < <(compgen -e | LC_ALL=C sort)
 }
 
 main "$@"
