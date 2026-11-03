@@ -18,6 +18,58 @@ rex.action{
   end
 }
 
+-- Keep relative tab actions inside the current local or remote session.
+rex.action{
+  name = "session_tab",
+  title = "Change Tab in Session",
+  args = { step = "integer" },
+  repeats = true,
+  run = function(ctx, args)
+    local view, err = rex.session.view{}
+
+    if err ~= nil then
+      error(err, 0)
+    end
+
+    local windows = view.windows or {}
+
+    if #windows < 2 then
+      return
+    end
+
+    local active
+    local focused
+
+    for i, window in ipairs(windows) do
+      if window.window_id == view.active_window_id then
+        active = i
+      end
+
+      for _, layer in ipairs(window.layers or {}) do
+        for _, block in ipairs(layer.blocks or {}) do
+          if ctx.block_id ~= nil and block.block_id == ctx.block_id then
+            focused = i
+          end
+        end
+      end
+    end
+
+    local current = focused or active
+
+    if current == nil then
+      error("Cannot find the current tab", 0)
+    end
+
+    -- Wrap by moving through this session, without crossing its boundary.
+    local target = ((current - 1 + args.step) % #windows) + 1
+    local distance = target - current
+    local action = distance > 0 and "client.tab.next" or "client.tab.previous"
+
+    for _ = 1, math.abs(distance) do
+      rex.client.queue(action)
+    end
+  end
+}
 
 -- ~/.tmux.conf
 rex.bind("ctrl+b>ctrl+a", "pane.send_key", { key = "ctrl+b" })
@@ -44,10 +96,10 @@ rex.bind("ctrl+b>shift+k", "pane.resize", { amount = 2, direction = "up" })
 rex.bind("repeat/shift+k", "pane.resize", { amount = 2, direction = "up" })
 rex.bind("ctrl+b>shift+l", "pane.resize", { amount = 2, direction = "right" })
 rex.bind("repeat/shift+l", "pane.resize", { amount = 2, direction = "right" })
-rex.bind("ctrl+b>ctrl+h", "client.tab.previous")
-rex.bind("repeat/ctrl+h", "client.tab.previous")
-rex.bind("ctrl+b>ctrl+l", "client.tab.next")
-rex.bind("repeat/ctrl+l", "client.tab.next")
+rex.bind("ctrl+b>ctrl+h", "session_tab", { step = -1 })
+rex.bind("repeat/ctrl+h", "session_tab", { step = -1 })
+rex.bind("ctrl+b>ctrl+l", "session_tab", { step = 1 })
+rex.bind("repeat/ctrl+l", "session_tab", { step = 1 })
 
 -- ~/.config/herdr/config.toml
 rex.bind("ctrl+a>s", "client.settings")
@@ -70,10 +122,10 @@ rex.bind("ctrl+a>shift+right", "session.next")
 rex.bind("ctrl+a>shift+c", "client.tab.new")
 rex.bind("ctrl+a>c", "client.tab.new")
 rex.bind("ctrl+a>shift+t", "client.tab.rename")
-rex.bind("ctrl+a>p", "client.tab.previous")
-rex.bind("ctrl+a>ctrl+h", "client.tab.previous")
-rex.bind("ctrl+a>n", "client.tab.next")
-rex.bind("ctrl+a>ctrl+l", "client.tab.next")
+rex.bind("ctrl+a>p", "session_tab", { step = -1 })
+rex.bind("ctrl+a>ctrl+h", "session_tab", { step = -1 })
+rex.bind("ctrl+a>n", "session_tab", { step = 1 })
+rex.bind("ctrl+a>ctrl+l", "session_tab", { step = 1 })
 rex.bind("ctrl+a>1", "client.tab.goto", { index = 1 })
 rex.bind("ctrl+a>2", "client.tab.goto", { index = 2 })
 rex.bind("ctrl+a>3", "client.tab.goto", { index = 3 })
