@@ -26,6 +26,9 @@
     ~/.config/ghostty:
       create: true
       path: config/ghostty
+    ~/.config/rex/init.lua:
+      create: true
+      path: config/rex/init.lua
     ~/.config/herdr/plugins/config/persiyanov.reviewr/config.toml:
       create: true
       path: config/herdr/plugins/config/persiyanov.reviewr/config.toml
