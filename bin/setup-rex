@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+main() {
+  if [[ "$(uname -s)" != "Linux" ]]; then
+    printf 'Rex devbox setup requires Linux.\n' >&2
+    return 1
+  fi
+
+  if ! install_rex; then
+    return 1
+  fi
+
+  start_rex_server
+}
+
+install_rex() {
+  local help
+
+  if command -v rex >/dev/null 2>&1 && help="$(rex --help 2>&1)" && [[ "$help" == *'The multiplexer for all work.'* ]]; then
+    printf 'Rex is already installed.\n'
+    return 0
+  fi
+
+  local installer
+  installer="$(mktemp)" || return 1
+
+  if ! curl -fsSL https://pkgs.superlogical.com/rex/install.sh -o "$installer"; then
+    rm -f "$installer"
+    printf 'Cannot download the Rex installer.\n' >&2
+    return 1
+  fi
+
+  # Match the existing snapshot package on devbox-1. The package includes terminfo.
+  if ! sh "$installer" --channel snapshot; then
+    rm -f "$installer"
+    printf 'Rex installation failed.\n' >&2
+    return 1
+  fi
+
+  rm -f "$installer"
+  hash -r
+
+  if ! command -v rex >/dev/null 2>&1 || ! help="$(rex --help 2>&1)" || [[ "$help" != *'The multiplexer for all work.'* ]]; then
+    printf 'Terminal Rex is not available after installation.\n' >&2
+    return 1
+  fi
+}
+
+start_rex_server() {
+  local status tunnel_status instance_id tunnel_instance_id
+
+  # Coder forwards this loopback listener through its authenticated connection.
+  # Starting again preserves an existing server and every session on it.
+  if ! status="$(rex server start --extra-listen http://127.0.0.1:7297 --allow-anonymous --json)"; then
+    printf 'Cannot start the Rex server.\n' >&2
+    return 1
+  fi
+
+  if ! tunnel_status="$(rex -S http://127.0.0.1:7297 --autostart=false server status --json 2>/dev/null)"; then
+    printf 'Rex is not reachable on loopback port 7297. Existing sessions were preserved.\n' >&2
+    printf 'An older server needs its listener changed before a tunnel can connect.\n' >&2
+    return 1
+  fi
+
+  instance_id="$(printf '%s\n' "$status" | sed -n 's/.*"instance_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+  tunnel_instance_id="$(printf '%s\n' "$tunnel_status" | sed -n 's/.*"instance_id"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')"
+
+  if [[ -z "$instance_id" || "$tunnel_instance_id" != "$instance_id" ]]; then
+    printf 'Loopback port 7297 belongs to another server. Existing sessions were preserved.\n' >&2
+    return 1
+  fi
+
+  printf '%s\n' "$status"
+  printf 'Rex is ready for a Coder tunnel on loopback port 7297.\n'
+}
+
+main "$@"

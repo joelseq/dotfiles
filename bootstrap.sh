@@ -144,6 +144,17 @@ install_brew_packages() {
   ok "Brew packages installed"
 }
 
+setup_rex() {
+  info "Installing and starting Rex..."
+
+  if ! bash "$DOTFILES_DIR/bin/setup-rex"; then
+    error "Rex setup failed"
+    return 1
+  fi
+
+  ok "Rex setup complete"
+}
+
 install_herdr() {
   local install_dir="$HOME/.local/bin"
   local plugins=(
@@ -499,6 +510,7 @@ main() {
   set_default_shell
   backup_existing_dotfiles
   run_dotbot
+  setup_rex
   install_herdr_pi_integration
   install_nvim_plugins
   install_work_state

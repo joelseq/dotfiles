@@ -320,7 +320,7 @@ test_main_installs_pi_after_node_and_integration_after_dotbot() {
   stub_main_dependencies
   main >/dev/null
 
-  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr\nnode\npi\ndotbot\nintegration' ]] || fail "main installation order is wrong"
+  [[ "$(cat "$BOOTSTRAP_MAIN_LOG")" == $'brew\nherdr\nnode\npi\ndotbot\nrex\nintegration' ]] || fail "main installation order is wrong"
 }
 
 stub_main_dependencies() {
@@ -337,6 +337,7 @@ stub_main_dependencies() {
   set_default_shell() { :; }
   backup_existing_dotfiles() { :; }
   run_dotbot() { printf 'dotbot\n' >>"$BOOTSTRAP_MAIN_LOG"; }
+  setup_rex() { printf 'rex\n' >>"$BOOTSTRAP_MAIN_LOG"; }
   install_nvim_plugins() { :; }
   install_work_state() { :; }
   install_work_config() { :; }
