@@ -32,6 +32,9 @@
     ~/.config/rex/themes:
       create: true
       path: config/rex/themes
+    ~/.config/herdr-app/keys.json:
+      create: true
+      path: config/herdr-app/keys.json
     ~/.config/herdr/plugins/config/persiyanov.reviewr/config.toml:
       create: true
       path: config/herdr/plugins/config/persiyanov.reviewr/config.toml
