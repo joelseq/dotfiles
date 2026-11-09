@@ -209,3 +209,91 @@ function dn() {
 		echo "No daily note for today: $(date +%Y-%m-%d)"
 	fi
 }
+
+# Herdr remote workspace picker and optional reconnect loop.
+function hdr() {
+  _hdrr herdr-remote
+}
+
+function hdrr() {
+  _hdrr herdr-remote-retry
+}
+
+function herdr-remote() {
+  herdr --remote-keybindings server --remote "$@"
+}
+
+function herdr-remote-retry() {
+  local exit_code
+
+  while true; do
+    if herdr-remote "$@"; then
+      return 0
+    else
+      exit_code=$?
+    fi
+
+    if (( exit_code == 130 || exit_code == 143 )); then
+      return "$exit_code"
+    fi
+
+    print -u2 "Herdr exited $exit_code. Reconnect in 2 seconds. Press Ctrl-C to stop."
+    sleep 2 || return 130
+  done
+}
+
+function _hdrr() {
+  local connect_command=$1
+
+  local missing=()
+  command -v herdr >/dev/null || missing+=(herdr)
+  command -v coder >/dev/null || missing+=(coder)
+  command -v fzf >/dev/null || missing+=(fzf)
+  command -v jq >/dev/null || missing+=(jq)
+  if (( ${#missing[@]} )); then
+    echo "Error: missing dependencies: ${missing[*]}" >&2
+    return 1
+  fi
+
+  local tmpfile
+  tmpfile=$(mktemp) || return 1
+
+  {
+    if ! coder list -o json > "$tmpfile" 2>/dev/null; then
+      echo "Error: coder list failed. Try: coder login https://coder.figdev.systems" >&2
+      return 1
+    fi
+
+    local selected ws_name owner_name
+    selected=$(jq -r '
+      .[] |
+      [
+        (.name // .latest_build.workspace_name),
+        (.template_name // "-"),
+        (.latest_build.status // "-"),
+        (if .health.healthy then "healthy" else "unhealthy" end),
+        (.owner_name // "")
+      ] | @tsv
+    ' "$tmpfile" | fzf \
+      --height=80% \
+      --layout=reverse \
+      --border=rounded \
+      --prompt="Herdr workspaces > " \
+      --header="Enter:connect | q:exit" \
+      --delimiter=$'\t' \
+      --with-nth=1,2,3,4 \
+      --bind="j:down,k:up" \
+      --bind="q:abort") || return 0
+
+    [[ -z "$selected" ]] && return 0
+    ws_name=${selected%%$'\t'*}
+    owner_name=${selected##*$'\t'}
+    if [[ -z "$owner_name" ]]; then
+      echo "Error: selected workspace has no owner" >&2
+      return 1
+    fi
+    "$connect_command" "devcontainer.$ws_name.$owner_name.coder"
+  } always {
+    rm -f "$tmpfile"
+  }
+}
