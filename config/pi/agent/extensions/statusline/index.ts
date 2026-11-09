@@ -1,5 +1,5 @@
 import type { AssistantMessage } from "@earendil-works/pi-ai"
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent"
+import type { ExtensionAPI, Theme } from "@earendil-works/pi-coding-agent"
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui"
 import path from "node:path"
 
@@ -44,15 +44,27 @@ function totalsFromBranch(ctx: any): UsageTotals {
   return totals
 }
 
-function contextPart(ctx: any): string | null {
+function contextPart(ctx: any, theme: Theme): string | null {
   const usage = ctx.getContextUsage?.()
-  if (!usage?.tokens) return null
+  if (usage?.tokens == null || !Number.isFinite(usage.tokens)) return null
 
   const window = ctx.model?.contextWindow ?? ctx.model?.context_window
-  if (!window) return `ctx ${fmtCount(usage.tokens)}`
+  if (!window || !Number.isFinite(window) || window < 0)
+    return theme.fg("muted", `ctx ${fmtCount(usage.tokens)}`)
 
-  const percent = Math.min(999, Math.round((usage.tokens / window) * 100))
-  return `ctx ${percent}%`
+  const percent = Math.max(
+    0,
+    Math.min(999, Math.floor((usage.tokens / window) * 100)),
+  )
+  const barWidth = 10
+  const filled = Math.floor((Math.min(100, percent) / 100) * barWidth)
+  let color: "success" | "warning" | "error" = "success"
+  if (percent >= 90) color = "error"
+  else if (percent >= 70) color = "warning"
+  const bar =
+    theme.fg(color, "█".repeat(filled)) +
+    theme.fg("borderMuted", "░".repeat(barWidth - filled))
+  return `${bar} ${theme.fg(color, `${percent}%`)}`
 }
 
 function statusParts(statuses: ReadonlyMap<string, string>): string[] {
@@ -94,19 +106,12 @@ export default function betterStatusline(pi: ExtensionAPI) {
           const modelPart = `${provider}/${model}${thinking}`
           const usage = totalsFromBranch(ctx)
           const usagePart = `↑${fmtCount(usage.input)} ↓${fmtCount(usage.output)} ${fmtCost(usage.cost)}`
-          const ctxPart = contextPart(ctx)
+          const ctxPart = contextPart(ctx, theme)
           const extParts = statusParts(
             footerData.getExtensionStatuses?.() ?? new Map(),
           )
 
           const leftItems = ["π", cwd, branchPart]
-          const rightItems = [
-            modelPart,
-            ctxPart,
-            usagePart,
-            ...extParts,
-          ].filter(Boolean) as string[]
-
           const sep = theme.fg("borderMuted", "  │  ")
           const left = [
             theme.fg("accent", leftItems[0]),
@@ -115,7 +120,7 @@ export default function betterStatusline(pi: ExtensionAPI) {
           ].join(sep)
           const right = [
             theme.fg("toolTitle", modelPart),
-            ctxPart ? theme.fg("warning", ctxPart) : undefined,
+            ctxPart,
             theme.fg("success", usagePart),
             ...extParts.map((part) => theme.fg("muted", part)),
           ]
@@ -127,25 +132,19 @@ export default function betterStatusline(pi: ExtensionAPI) {
 
           const compactRight = [
             theme.fg("toolTitle", modelPart),
-            ctxPart ? theme.fg("warning", ctxPart) : undefined,
+            ctxPart,
             theme.fg("success", usagePart),
           ]
             .filter(Boolean)
             .join(theme.fg("borderMuted", " │ "))
-          const compactRightRaw = [modelPart, ctxPart, usagePart]
-            .filter(Boolean)
-            .join(" │ ")
           const compactGap =
             width - visibleWidth(left) - visibleWidth(compactRight)
           if (compactGap >= 1)
             return [left + " ".repeat(compactGap) + compactRight]
 
           return [
-            truncateToWidth(
-              `${leftItems.join(" ")} ${compactRightRaw}`,
-              width,
-              "…",
-            ),
+            truncateToWidth(left, width, "…"),
+            truncateToWidth(compactRight, width, "…"),
           ]
         },
       }
