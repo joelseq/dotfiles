@@ -56,14 +56,18 @@ function contextPart(ctx: any, theme: Theme): string | null {
     0,
     Math.min(999, Math.floor((usage.tokens / window) * 100)),
   )
-  const barWidth = 10
+  // Fixed positions reveal green → yellow → orange → red as usage grows.
+  const gradient = [40, 76, 112, 148, 184, 220, 214, 208, 202, 196]
+  const barWidth = gradient.length
   const filled = Math.floor((Math.min(100, percent) / 100) * barWidth)
   let color: "success" | "warning" | "error" = "success"
   if (percent >= 90) color = "error"
   else if (percent >= 70) color = "warning"
   const bar =
-    theme.fg(color, "█".repeat(filled)) +
-    theme.fg("borderMuted", "░".repeat(barWidth - filled))
+    gradient
+      .slice(0, filled)
+      .map((shade) => `\x1b[38;5;${shade}m█\x1b[39m`)
+      .join("") + theme.fg("borderMuted", "░".repeat(barWidth - filled))
   return `${bar} ${theme.fg(color, `${percent}%`)}`
 }
 
@@ -137,13 +141,13 @@ export default function betterStatusline(pi: ExtensionAPI) {
           ]
             .filter(Boolean)
             .join(theme.fg("borderMuted", " │ "))
-          const compactGap =
-            width - visibleWidth(left) - visibleWidth(compactRight)
-          if (compactGap >= 1)
-            return [left + " ".repeat(compactGap) + compactRight]
+          const statusRow = [
+            left,
+            ...extParts.map((part) => theme.fg("muted", part)),
+          ].join(theme.fg("borderMuted", " │ "))
 
           return [
-            truncateToWidth(left, width, "…"),
+            truncateToWidth(statusRow, width, "…"),
             truncateToWidth(compactRight, width, "…"),
           ]
         },
