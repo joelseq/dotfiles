@@ -15,7 +15,7 @@ return {
     -- Configuration table of features provided by AstroLSP
     features = {
       codelens = true, -- enable/disable codelens refresh on start
-      inlay_hints = false, -- enable/disable inlay hints on start
+      inlay_hints = true, -- enable/disable inlay hints on start
       semantic_tokens = true, -- enable/disable semantic token highlighting
     },
     -- customize lsp formatting options
@@ -37,6 +37,7 @@ return {
         "tsserver",
         "vtsls",
         "tsgo",
+        "tsc",
         "solargraph",
       },
       timeout_ms = 1000, -- default format timeout
@@ -94,6 +95,13 @@ return {
         cmd = { "bundle", "exec", "ruby-lsp" },
         -- native `vim.lsp.config` root_dir signature: (bufnr, on_dir)
         root_dir = function(bufnr, on_dir) on_dir(vim.fs.root(bufnr, { "Gemfile", ".git" }) or vim.fn.getcwd()) end,
+      },
+      zls = {
+        enable_inlay_hints = true,
+        inlay_hints_show_builtin = true,
+        inlay_hints_exclude_single_argument = true,
+        inlay_hints_hide_redundant_param_names = false,
+        inlay_hints_hide_redundant_param_names_last_token = false,
       },
     },
     -- customize how language servers are attached

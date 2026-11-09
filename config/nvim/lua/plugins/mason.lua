@@ -23,7 +23,8 @@ return {
       "sorbet",
       "svelte-language-server",
       -- "tailwindcss-language-server",
-      "tsgo",
+      -- "tsgo",
+      "tsc",
       "yaml-language-server",
       "zls",
       -- formatters / linters

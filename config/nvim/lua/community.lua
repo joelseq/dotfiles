@@ -13,6 +13,7 @@ return {
   { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.typescript" },
   { import = "astrocommunity.pack.gleam" },
+  { import = "astrocommunity.pack.elixir" },
   -- { import = "astrocommunity.pack.ruby" },
   { import = "astrocommunity.pack.cpp" },
   -- { import = "astrocommunity.pack.tailwindcss" },

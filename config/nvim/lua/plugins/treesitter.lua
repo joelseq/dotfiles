@@ -1,7 +1,7 @@
 -- Customize Treesitter
 
 ---@type LazySpec
-return {
+local astrocore = {
   "AstroNvim/astrocore",
   ---@type AstroCoreOpts
   opts = function(_, opts)
@@ -34,4 +34,13 @@ return {
       "yaml",
     })
   end,
+}
+
+return {
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "master",
+    build = ":TSUpdate",
+  },
+  astrocore,
 }
