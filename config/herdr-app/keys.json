@@ -126,7 +126,9 @@
     "ctrl-a (": "space.select:9",
     "ctrl-a _": "pane.split:down",
     "ctrl-a ctrl-a": "send:\u0001",
-    "ctrl-a escape": "send:"
+    "ctrl-a escape": "send:",
+    "ctrl-a f": "mod.open:toggle-files",
+    "ctrl-a g": "mod.open:toggle-changes"
   },
   "terminal": {
     "ctrl-backspace": "send:\u0017",

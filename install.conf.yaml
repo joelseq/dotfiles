@@ -35,6 +35,18 @@
     ~/.config/herdr-app/keys.json:
       create: true
       path: config/herdr-app/keys.json
+    ~/.config/herdr-app/mods/toggle-files/main.js:
+      create: true
+      path: config/herdr-app/mods/toggle-files/main.js
+    ~/.config/herdr-app/mods/toggle-files/mod.json:
+      create: true
+      path: config/herdr-app/mods/toggle-files/mod.json
+    ~/.config/herdr-app/mods/toggle-changes/main.js:
+      create: true
+      path: config/herdr-app/mods/toggle-changes/main.js
+    ~/.config/herdr-app/mods/toggle-changes/mod.json:
+      create: true
+      path: config/herdr-app/mods/toggle-changes/mod.json
     ~/.config/herdr/plugins/config/persiyanov.reviewr/config.toml:
       create: true
       path: config/herdr/plugins/config/persiyanov.reviewr/config.toml
