@@ -510,7 +510,7 @@ main() {
   set_default_shell
   backup_existing_dotfiles
   run_dotbot
-  setup_rex
+  # setup_rex
   install_herdr_pi_integration
   install_nvim_plugins
   install_work_state
