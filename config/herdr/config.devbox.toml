@@ -57,8 +57,8 @@ open_worktree = "prefix+alt+g"
 remove_worktree = "prefix+alt+shift+g"
 
 # Agent sidebar navigation.
-previous_agent = "prefix+alt+up"
-next_agent = "prefix+alt+down"
+previous_agent = ["prefix+alt+up", "ctrl+alt+k"]
+next_agent = ["prefix+alt+down", "ctrl+alt+j"]
 focus_agent = "prefix+alt+1..9"
 
 # Tabs are the closest analogue to tmux windows.
