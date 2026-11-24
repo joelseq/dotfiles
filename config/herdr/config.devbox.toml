@@ -165,3 +165,9 @@ description = "open lazygit popup"
 width = "90%"
 height = "90%"
 
+
+[[keys.command]]
+key = "prefix+shift+s"
+type = "plugin_action"
+command = "joelseq.stack-reviewr.toggle"
+description = "toggle Graphite stack review"
